@@ -254,6 +254,9 @@ main {
 	.area-resource-packs {
 		grid-column-end: span 6;
 	}
+	.area-gamerules {
+		columns: 2;
+	}
 }
 
 @media screen and (min-width: 1025px) {
@@ -277,5 +280,8 @@ main {
 	}
 	.area-hardware {
 		grid-column-end: span 6;
+	}
+	.area-gamerules {
+		columns: 3;
 	}
 }
