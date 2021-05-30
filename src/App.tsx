@@ -1,6 +1,7 @@
 import type { FunctionalComponent } from 'preact'
 import { useState } from 'preact/hooks'
 import { EmptyPanel } from './components/EmptyPanel'
+import { GamerulesPanel } from './components/GamerulesPanel'
 import { OverviewPanel } from './components/OverviewPanel'
 import { SystemPanel } from './components/SystemPanel'
 import { Octicon } from './Octicon'
@@ -9,7 +10,8 @@ import { Report } from './Report'
 const panels: [string, FunctionalComponent<Report>][] = [
 	['Overview', OverviewPanel],
 	['System', SystemPanel],
-	['Entities', EmptyPanel],
+	['Gamerules', GamerulesPanel],
+	['levels', EmptyPanel],
 	['Profiling', EmptyPanel],
 ]
 
@@ -17,7 +19,6 @@ export function App() {
 	const [reports, setReports] = useState<Report[]>([])
 	const [activeTab, setTab] = useState(0)
 	const [activePanel, setPanel] = useState(0)
-	const report = reports[activeTab]
 
 	const removeReport = (index: number) => {
 		setReports(reports.filter((_, i) => i !== index))
@@ -36,6 +37,7 @@ export function App() {
 					setTab(exists)
 				} else {
 					console.log(newReport.name, newReport)
+					setTab(reports.length)
 					setReports([...reports, newReport])
 				}
 			}
@@ -67,7 +69,7 @@ export function App() {
 				))}
 			</ul>
 			<div class="report">
-				{panels[activePanel][1](report)}
+				{panels[activePanel][1](reports[activeTab])}
 			</div>
 		</>}
 	</main>

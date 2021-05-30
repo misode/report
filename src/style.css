@@ -133,6 +133,7 @@ main {
 
 .report {
 	display: grid;
+	grid-template-columns: repeat(12, 1fr);
 	gap: 20px;
 	padding: 10px 30px
 }
@@ -144,27 +145,27 @@ main {
 	overflow: hidden;
 }
 
-.card-title {
-	margin-bottom: 10px;
+.card-title + .card-table {
+	margin-top: 10px;
 }
 
 .card-key {
 	color: #aaa;
 }
 
-.card.tick-graph {
+.card.graph {
 	display: flex;
 	height: 150px;
 	position: relative;
 	padding: 0;
 }
 
-.tick-value {
+.graph-value {
 	width: 100%;
 	position: relative;
 }
 
-.tick-value::before {
+.graph-value::before {
 	content: '';
 	position: absolute;
 	bottom: 0;
@@ -174,12 +175,12 @@ main {
 	background-color: var(--color);
 }
 
-.tick-value:hover::before {
+.graph-value:hover::before {
 	outline: 1px solid #fff;
 	z-index: 1
 }
 
-.tick-value:hover::after {
+.graph-value:hover::after {
 	counter-reset: value var(--value);
 	content: counter(value);
 	position: absolute;
@@ -192,12 +193,12 @@ main {
 	filter: drop-shadow(0 0 4px black);
 }
 
-.tick-value:nth-last-child(-n+50):hover::after {
+.graph-value:nth-last-child(-n+50):hover::after {
 	right: 100%;
 	left: initial;
 }
 
-.tick-title, .tick-info {
+.graph-title, .graph-info {
 	position: absolute;
 	top: 0;
 	margin: 10px;
@@ -205,18 +206,76 @@ main {
 	filter: drop-shadow(0 0 4px black);
 }
 
-.tick-title {
+.graph-title {
 	left: 0;
 }
 
-.tick-info {
+.graph-info {
 	right: 0;
 }
 
-.card.collection-card .card-value {
-	display: inline-block;
+.collection-list {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.collection-list .card-value {
 	background-color: #0b5ca7;
 	padding: 4px 8px;
-	margin-right: 8px;
+	margin: 8px 8px 0 0;
 	border-radius: 6px;
+}
+
+/* Panel Layout */
+
+.report > * {
+	grid-column-end: span 12;
+}
+
+@media screen and (min-width: 481px) {
+}
+
+@media screen and (min-width: 769px) {
+	.area-stats {
+		grid-column-end: span 5;
+	}
+	.area-tick-graph {
+		grid-column-end: span 7;
+	}
+	.area-version {
+		grid-column-end: span 6;
+	}
+	.area-game-options {
+		grid-column-end: span 6;
+	}
+	.area-data-packs {
+		grid-column-end: span 6;
+	}
+	.area-resource-packs {
+		grid-column-end: span 6;
+	}
+}
+
+@media screen and (min-width: 1025px) {
+	.area-stats {
+		grid-column-end: span 6;
+	}
+	.area-tick-graph {
+		grid-column-end: span 6;
+	}
+	.area-server-metrics {
+		grid-column-end: span 6;
+	}
+	.area-client-metrics {
+		grid-column-end: span 6;
+	}
+}
+
+@media screen and (min-width: 1201px) {
+	.area-software {
+		grid-column-end: span 6;
+	}
+	.area-hardware {
+		grid-column-end: span 6;
+	}
 }

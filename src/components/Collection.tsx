@@ -1,10 +1,13 @@
 type CollectionProps = {
+	name: string,
 	title?: string,
 	items: string[],
 }
-export function Collection({ title, items }: CollectionProps) {
-	return <div class="card collection-card">
+export function CollectionCard({ title, items, name }: CollectionProps) {
+	return <div class={`card area-${name}`}>
 		{title && <div class="card-title">{title}</div>}
-		{items.map(i => <span class="card-value">{i}</span>)}
+		<div class="collection-list">
+			{items.map(i => <span class="card-value">{i}</span>)}
+		</div>
 	</div>
 }
