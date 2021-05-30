@@ -13,7 +13,9 @@ module.exports = {
 	],
 	"ignorePatterns": [
 		"**/node_modules",
-		"**/dist"
+		"**/dist",
+		".eslintrc.js",
+		"vite.config.js"
 	],
 	"rules": {
 		"@typescript-eslint/consistent-type-imports": [

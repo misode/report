@@ -4,5 +4,11 @@
 			"source.organizeImports": true,
 			"source.fixAll.eslint": true
 		}
+	},
+	"[typescriptreact]": {
+		"editor.codeActionsOnSave": {
+			"source.organizeImports": true,
+			"source.fixAll.eslint": true
+		}
 	}
 }

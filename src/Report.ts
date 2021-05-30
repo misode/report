@@ -67,6 +67,7 @@ export type SystemReport = {
 }
 
 export type Report = {
+	name: string,
 	client: {
 		metrics: {
 			ticking: {
@@ -117,6 +118,7 @@ export namespace Report {
 		const levels = await Promise.all(levelIds.map(path => loadLevel(zip, path)))
 
 		return {
+			name: file.name,
 			client: {
 				metrics: {
 					ticking: clientTicks.map(row => ({
