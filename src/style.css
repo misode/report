@@ -1,12 +1,16 @@
-* {
+
+*, ::before, ::after {
 	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
+
+	--dark-1: #232327;
+	--dark-2: #323238;
 }
 
 body {
 	overflow-x: hidden;
-	background-color: #232327;
+	background-color: var(--dark-1);
 	min-height: 100vh;
 }
 
@@ -38,7 +42,8 @@ main {
 .tabs {
 	display: flex;
 	list-style: none;
-	background-color: #34343a;
+	padding: 0 6px;
+	background-color: var(--dark-2);
 }
 
 .tab {
@@ -46,8 +51,8 @@ main {
 	min-width: 0;
 	align-items: center;
 	padding: 6px;
-	/* border-top-left-radius: 8px; */
-	/* border-top-right-radius: 8px; */
+	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
 	cursor: pointer;
 	user-select: none;
 	-moz-user-select: none;
@@ -91,21 +96,67 @@ main {
 	fill: #fff;
 }
 
-.report {
+.panels {
 	display: flex;
-	flex-direction: column;
-	padding: 30px
+	position: sticky;
+	z-index: 10;
+	top: 0;
+	justify-content: center;
+	list-style: none;
+	background-color: #232327;
 }
 
-.tick-graph {
+.panel {
 	display: flex;
-	max-width: 820px;
-	height: 150px;
-	margin: 10px 0;
-	position: relative;
-	background-color: #34343a;
+	min-width: 0;
+	align-items: center;
+	font-size: 18px;
+	padding: 6px 12px;
+	margin: 6px 0;
+	color: #aaa;
+	border-bottom: 2px solid transparent;
+	cursor: pointer;
+	user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-webkit-user-select: none;
+}
+
+.panel:hover {
+	color: #ddd;
+}
+
+.panel.active {
+	color: #fff;
+	border-color: #ddd;
+}
+
+.report {
+	display: grid;
+	gap: 20px;
+	padding: 10px 30px
+}
+
+.card {
+	padding: 10px;
+	background-color: var(--dark-2);
 	border-radius: 8px;
 	overflow: hidden;
+}
+
+.card-title {
+	margin-bottom: 10px;
+}
+
+.card-key {
+	color: #aaa;
+}
+
+.card.tick-graph {
+	display: flex;
+	height: 150px;
+	position: relative;
+	padding: 0;
 }
 
 .tick-value {
@@ -119,16 +170,13 @@ main {
 	bottom: 0;
 	left: 0;
 	width: 100%;
-	height: calc(146px * var(--value) / var(--max-value));
-	--hue: calc(180deg - 180deg * var(--value) / var(--max-value));
-	background-color: hsla(min(var(--hue), 120deg), 97%, 56%, 0.808);
-	/* transition: background-color 0.2s; */
+	height: calc(146px * var(--value) / var(--goal));
+	background-color: var(--color);
 }
 
 .tick-value:hover::before {
 	outline: 1px solid #fff;
 	z-index: 1
-	/* background-color: hsla(clamp(var(--hue), 0deg, 100deg), 100%, 70%, 1); */
 }
 
 .tick-value:hover::after {
@@ -141,6 +189,7 @@ main {
 	left: 100%;
 	pointer-events: none;
 	color: #fff;
+	filter: drop-shadow(0 0 4px black);
 }
 
 .tick-value:nth-last-child(-n+50):hover::after {
@@ -148,18 +197,26 @@ main {
 	left: initial;
 }
 
-.tick-title {
+.tick-title, .tick-info {
 	position: absolute;
 	top: 0;
-	left: 0;
 	margin: 10px;
 	z-index: 1;
+	filter: drop-shadow(0 0 4px black);
+}
+
+.tick-title {
+	left: 0;
 }
 
 .tick-info {
-	position: absolute;
-	top: 0;
 	right: 0;
-	margin: 10px;
-	z-index: 1;
+}
+
+.card.collection-card .card-value {
+	display: inline-block;
+	background-color: #0b5ca7;
+	padding: 4px 8px;
+	margin-right: 8px;
+	border-radius: 6px;
 }

@@ -1,12 +1,23 @@
+import type { FunctionalComponent } from 'preact'
 import { useState } from 'preact/hooks'
-import { TickGraph } from './components/TickGraph'
+import { EmptyPanel } from './components/EmptyPanel'
+import { OverviewPanel } from './components/OverviewPanel'
+import { SystemPanel } from './components/SystemPanel'
 import { Octicon } from './Octicon'
 import { Report } from './Report'
 
+const panels: [string, FunctionalComponent<Report>][] = [
+	['Overview', OverviewPanel],
+	['System', SystemPanel],
+	['Entities', EmptyPanel],
+	['Profiling', EmptyPanel],
+]
+
 export function App() {
 	const [reports, setReports] = useState<Report[]>([])
-	const [active, setActive] = useState(0)
-	const report = reports[active]
+	const [activeTab, setTab] = useState(0)
+	const [activePanel, setPanel] = useState(0)
+	const report = reports[activeTab]
 
 	const removeReport = (index: number) => {
 		setReports(reports.filter((_, i) => i !== index))
@@ -22,7 +33,7 @@ export function App() {
 				const newReport = await Report.fromZip(file)
 				const exists = reports.findIndex(r => r.name === newReport.name)
 				if (exists >= 0) {
-					setActive(exists)
+					setTab(exists)
 				} else {
 					console.log(newReport.name, newReport)
 					setReports([...reports, newReport])
@@ -42,16 +53,21 @@ export function App() {
 		</> : <>
 			<ul class="tabs">
 				{reports.map((report, i) => (
-					<li class={`tab${active === i ? ' active' : ''}`} onClick={() => setActive(i)} title={report.name}>
+					<li class={`tab${activeTab === i ? ' active' : ''}`} onClick={() => setTab(i)} title={report.name}>
 						<div class="tab-name">{report.name}</div>
 						<button class="tab-remove" onClick={() => removeReport(i)}>{Octicon.x}</button>
 					</li>
 				))}
 			</ul>
+			<ul class="panels">
+				{panels.map((panel, i) => (
+					<li class={`panel${activePanel === i ? ' active' : ''}`} onClick={() => setPanel(i)}>
+						{panel[0]}
+					</li>
+				))}
+			</ul>
 			<div class="report">
-				<TickGraph data={report.server.stats.tickTimes.map(t => Math.round(t / 1000000))} title="Tick times" />
-				<TickGraph data={report.server.metrics.ticking.map(t => t.tickTime)} title="Server metrics" />
-				<TickGraph data={report.client.metrics.ticking.map(t => t.tickTime)} title="Client metrics"/>
+				{panels[activePanel][1](report)}
 			</div>
 		</>}
 	</main>
