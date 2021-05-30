@@ -105,7 +105,6 @@ export namespace Report {
 	export async function fromZip(file: File): Promise<Report> {
 		const buffer = await file.arrayBuffer()
 		const zip = await JSZip.loadAsync(buffer)
-		console.log(Object.keys(zip.files))
 
 		const clientTicks = await loadCsv(zip, 'client/metrics/ticking.csv')
 		const options = await loadList(zip, 'client/options.txt')
@@ -118,7 +117,7 @@ export namespace Report {
 		const levels = await Promise.all(levelIds.map(path => loadLevel(zip, path)))
 
 		return {
-			name: file.name,
+			name: file.name.replace(/\.zip$/, ''),
 			client: {
 				metrics: {
 					ticking: clientTicks.map(row => ({
