@@ -1,8 +1,23 @@
+import { Report } from './Report'
 import './style.css'
 
-const app = document.querySelector<HTMLDivElement>('#app')!
+document.addEventListener('DOMContentLoaded', () => {
 
-app.innerHTML = `
-	<h1>Hello Vite!</h1>
-	<a href="https://vitejs.dev/guide/features.html" target="_blank">Documentation</a>
-`
+	document.body.addEventListener('drop', async e => {
+		e.preventDefault()
+		if(!e.dataTransfer) return
+
+		for (let i = 0; i < e.dataTransfer.items.length; i++) {
+			const item = e.dataTransfer.items[i]
+			if (item.kind === 'file' && item.type.match(/^application\/(x-)?zip(-compressed)?$/)) {
+				const report = await Report.fromZip(item.getAsFile()!)
+				console.log(report)
+				document.body.innerHTML = JSON.stringify(report, null, 2)
+			}
+		}
+	}, false)
+
+	document.body.addEventListener('dragover', e => {
+		e.preventDefault()
+	}, false)
+})
