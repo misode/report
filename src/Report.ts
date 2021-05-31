@@ -111,6 +111,10 @@ export type Report = {
 			[dimension: string]: LevelReport,
 		},
 		metrics: {
+			jvm?: {
+				tick: number,
+				heap: number,
+			}[],
 			ticking: {
 				tick: number,
 				tickTime: number,
@@ -166,27 +170,28 @@ export namespace Report {
 	async function loadClient(zip: JSZip) {
 		if (!zip.files['client/']) return {}
 
-		const clientTicks = await loadCsv(zip, 'client/metrics/ticking.csv')
+		const ticking = await loadCsv(zip, 'client/metrics/ticking.csv')
 		const options = await loadList(zip, 'client/options.txt')
-		const clientProfiling = await loadProfilingDump(zip, 'client/profiling.txt')
+		const profiling = await loadProfilingDump(zip, 'client/profiling.txt')
 
 		return {
 			client: {
 				metrics: {
-					ticking: clientTicks.map(row => ({
+					ticking: ticking.map(row => ({
 						tick: parseInt(row['@tick']),
 						tickTime: Number(row['ticktime']),
 					})),
 				},
 				options: options,
-				profiling: clientProfiling,
+				profiling: profiling,
 			},
 		}
 	}
 
 	async function loadServer(zip: JSZip) {
-		const serverTicks = await loadCsv(zip, 'server/metrics/ticking.csv')
-		const serverProfiling = await loadProfilingDump(zip, 'server/profiling.txt')
+		const jvm = zip.files['server/metrics/jvm.csv']	? await loadCsv(zip, 'server/metrics/jvm.csv') : undefined
+		const ticking = await loadCsv(zip, 'server/metrics/ticking.csv')
+		const profiling = await loadProfilingDump(zip, 'server/profiling.txt')
 		const gamerules = await loadList(zip, 'server/gamerules.txt', '=') 
 		const stats = await loadList(zip, 'server/stats.txt')
 
@@ -200,13 +205,17 @@ export namespace Report {
 					levels[i],
 				])),
 				metrics: {
-					ticking: serverTicks.map(row => ({
+					jvm: jvm?.map(row => ({
+						tick: parseInt(row['@tick']),
+						heap: parseInt(row['heap MiB']),
+					})),
+					ticking: ticking.map(row => ({
 						tick: parseInt(row['@tick']),
 						tickTime: Number(row['ticktime']),
 					})),
 				},
 				gamerules: gamerules,
-				profiling: serverProfiling,
+				profiling: profiling,
 				stats: {
 					pendingTasks: parseInt(stats['pending_tasks']),
 					averageTickTime: parseFloat(stats['average_tick_time']),
