@@ -1,10 +1,10 @@
-type TickGraphProps = {
+type CardProps = {
 	name: string,
 	data: number[],
 	goal: number,
 	title?: string,
 }
-export function GraphCard({ data, goal, title, name }: TickGraphProps) {
+export function GraphCard({ data, goal, title, name }: CardProps) {
 	const average = (data.reduce((a,b) => (a+b)) / data.length).toFixed(3)
 	return <div class={`card graph area-${name}`} style={`--goal: ${goal * 1.5}`}>
 		{data.map(v => {

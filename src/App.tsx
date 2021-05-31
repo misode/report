@@ -1,9 +1,6 @@
 import type { FunctionalComponent } from 'preact'
 import { useState } from 'preact/hooks'
-import { EmptyPanel } from './components/EmptyPanel'
-import { GamerulesPanel } from './components/GamerulesPanel'
-import { OverviewPanel } from './components/OverviewPanel'
-import { SystemPanel } from './components/SystemPanel'
+import { EmptyPanel, GamerulesPanel, LevelsPanel, OverviewPanel, SystemPanel } from './components/panels'
 import { Octicon } from './Octicon'
 import { Report } from './Report'
 
@@ -11,7 +8,7 @@ const panels: [string, FunctionalComponent<Report>][] = [
 	['Overview', OverviewPanel],
 	['System', SystemPanel],
 	['Gamerules', GamerulesPanel],
-	['levels', EmptyPanel],
+	['Levels', LevelsPanel],
 	['Profiling', EmptyPanel],
 ]
 
