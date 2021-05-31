@@ -15,7 +15,7 @@ export function OverviewPanel({ report }: { report: Report }) {
 			data={report.server.stats.tickTimes.map(t => Math.round(t / 1000000))}/>
 		<GraphCard name="server-metrics" title="Full server tick" goal={50}
 			data={report.server.metrics.ticking.map(t => Math.round(t.tickTime / 1000000))}/>
-		<GraphCard name="client-metrics" title="Client tick" goal={60}
-			data={report.client.metrics.ticking.map(t => Math.round(1000 / (t.tickTime / 1000000)))}/>
+		{report.client && <GraphCard name="client-metrics" title="Client tick" goal={60}
+			data={report.client.metrics.ticking.map(t => Math.round(1000 / (t.tickTime / 1000000)))}/>}
 	</>
 }

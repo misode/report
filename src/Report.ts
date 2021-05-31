@@ -59,21 +59,21 @@ export type LevelReport = {
 export type SystemReport = {
 	versionName: string,
 	versionId: string,
-	isModded: boolean,
-	resourcePacks: string[],
+	isModded: 'Yes' | 'No' | 'Unknown',
+	resourcePacks?: string[],
 	dataPacks: string[],
 	operatingSystem: string,
 	javaVersion: string,
 	jvmVersion: string,
-	library: string,
+	library?: string,
 	processorName: string,
 	cpus: number,
 	frequency: number,
 	graphicsCardName: string,
 	playerCount: [number, number],
-	language: string,
-	graphicsMode: string,
-	vbos: boolean,
+	language?: string,
+	graphicsMode?: string,
+	vbos?: boolean,
 }
 
 export type ProfileDump = {
@@ -94,7 +94,7 @@ export type ProfilingReport = {
 
 export type Report = {
 	name: string,
-	client: {
+	client?: {
 		metrics: {
 			ticking: {
 				tick: number,
@@ -134,20 +134,43 @@ export namespace Report {
 		const buffer = await file.arrayBuffer()
 		const zip = await JSZip.loadAsync(buffer)
 
-		const clientTicks = await loadCsv(zip, 'client/metrics/ticking.csv')
-		const options = await loadList(zip, 'client/options.txt')
-		const clientProfiling = await loadProfilingDump(zip, 'client/profiling.txt')
-		const serverTicks = await loadCsv(zip, 'server/metrics/ticking.csv')
-		const serverProfiling = await loadProfilingDump(zip, 'server/profiling.txt')
-		const gamerules = await loadList(zip, 'server/gamerules.txt', '=') 
-		const stats = await loadList(zip, 'server/stats.txt')
 		const system = await loadList(zip, 'system.txt')
-
-		const levelIds = Object.keys(zip.files).filter(f => f.match(/^server\/levels\/[a-z0-9_-]+\/[a-z0-9_-]+\/$/))
-		const levels = await Promise.all(levelIds.map(path => loadLevel(zip, path)))
 
 		return {
 			name: file.name,
+			...await loadClient(zip),
+			...await loadServer(zip),
+			system: {
+				versionName: system['Minecraft Version'],
+				versionId: system['Minecraft Version ID'],
+				isModded: system['Is Modded'].startsWith('Probably not.') ? 'No'
+					: system['Is Modded'].startsWith('Unknown') ? 'Unknown' : 'Yes',
+				resourcePacks: system['Resource Packs']?.split(',').map(e => e.trim()),
+				dataPacks: system['Data Packs'].split(',').map(e => e.trim()),
+				operatingSystem: system['Operating System'],
+				javaVersion: system['Java Version'],
+				jvmVersion: system['Java VM Version'],
+				library: system['Backend library'],
+				processorName: system['Processor Name'],
+				cpus: parseInt(system['CPUs']),
+				frequency: parseFloat(system['Frequency (GHz)']),
+				graphicsCardName: system['Graphics card #0 name'],
+				playerCount: system['Player Count'].split(';')[0].split(' / ').map(v => parseInt(v)) as [number, number],
+				language: system['Current Language'],
+				graphicsMode: system['Graphics mode'],
+				vbos: system['Using VBOs'] ? system['Using VBOs'] === 'Yes' : undefined,
+			},
+		}
+	}
+
+	async function loadClient(zip: JSZip) {
+		if (!zip.files['client/']) return {}
+
+		const clientTicks = await loadCsv(zip, 'client/metrics/ticking.csv')
+		const options = await loadList(zip, 'client/options.txt')
+		const clientProfiling = await loadProfilingDump(zip, 'client/profiling.txt')
+
+		return {
 			client: {
 				metrics: {
 					ticking: clientTicks.map(row => ({
@@ -158,6 +181,19 @@ export namespace Report {
 				options: options,
 				profiling: clientProfiling,
 			},
+		}
+	}
+
+	async function loadServer(zip: JSZip) {
+		const serverTicks = await loadCsv(zip, 'server/metrics/ticking.csv')
+		const serverProfiling = await loadProfilingDump(zip, 'server/profiling.txt')
+		const gamerules = await loadList(zip, 'server/gamerules.txt', '=') 
+		const stats = await loadList(zip, 'server/stats.txt')
+
+		const levelIds = Object.keys(zip.files).filter(f => f.match(/^server\/levels\/[a-z0-9_-]+\/[a-z0-9_-]+\/$/))
+		const levels = await Promise.all(levelIds.map(path => loadLevel(zip, path)))
+
+		return {
 			server: {
 				levels: Object.fromEntries(levelIds.map((id, i) => [
 					id.replace(/^server\/levels\/([a-z0-9_-]+)\/([a-z0-9_-]+)\/$/, '$1:$2'),
@@ -176,25 +212,6 @@ export namespace Report {
 					averageTickTime: parseFloat(stats['average_tick_time']),
 					tickTimes: JSON.parse(stats['tick_times']),
 				},
-			},
-			system: {
-				versionName: system['Minecraft Version'],
-				versionId: system['Minecraft Version ID'],
-				isModded: !system['Is Modded'].startsWith('Probably not.'),
-				resourcePacks: system['Resource Packs'].split(',').map(e => e.trim()),
-				dataPacks: system['Data Packs'].split(',').map(e => e.trim()),
-				operatingSystem: system['Operating System'],
-				javaVersion: system['Java Version'],
-				jvmVersion: system['Java VM Version'],
-				library: system['Backend library'],
-				processorName: system['Processor Name'],
-				cpus: parseInt(system['CPUs']),
-				frequency: parseFloat(system['Frequency (GHz)']),
-				graphicsCardName: system['Graphics card #0 name'],
-				playerCount: system['Player Count'].split(';')[0].split(' / ').map(v => parseInt(v)) as [number, number],
-				language: system['Current Language'],
-				graphicsMode: system['Graphics mode'],
-				vbos: system['Using VBOs'] === 'Yes',
 			},
 		}
 	}

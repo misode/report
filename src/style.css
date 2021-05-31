@@ -322,7 +322,7 @@ main {
 	border-bottom: 2px solid #555;
 	position: sticky;
 	padding: 8px 10px;
-	top: 44px;
+	top: 41px;
 	z-index: 10;
 	background-color: var(--dark-2);
 	font-weight: bold;
@@ -433,10 +433,10 @@ main {
 }
 
 .area-entities .table-row {
-	grid-template-columns: 2fr 1fr 1fr;
+	grid-template-columns: 1fr 1fr 1fr;
 }
 .area-block-entities .table-row {
-	grid-template-columns: 2fr 1fr 1fr;
+	grid-template-columns: 1fr 1fr 1fr;
 }
 
 @media screen and (max-width: 480px) {
@@ -469,7 +469,7 @@ main {
 	}
 
 	.area-block-entities .table-row {
-		grid-template-columns: 2fr 1fr;
+		grid-template-columns: 1.2fr 1fr;
 	}
 	.area-block-entities .table-head .table-column:nth-child(3) {
 		display: none;
@@ -535,6 +535,10 @@ main {
 	}
 	.area-data-packs {
 		grid-column-end: span 6;
+	}
+	.server-report .area-data-packs {
+		grid-row: 1;
+		grid-column: 7/span 6;
 	}
 	.area-resource-packs {
 		grid-column-end: span 6;

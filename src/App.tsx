@@ -75,7 +75,7 @@ export function App() {
 					</li>
 				))}
 			</ul>
-			<div class="report">
+			<div class={`report ${activeReport.client ? 'client-report' : 'server-report'}`}>
 				{activePanel === 'Overview' && <OverviewPanel report={activeReport}/>}
 				{activePanel === 'System' && <SystemPanel report={activeReport}/>}
 				{activePanel === 'Gamerules' && <GamerulesPanel report={activeReport}/>}
@@ -93,7 +93,7 @@ export function App() {
 			<p>What you can do:
 				<ul>
 					<li>Ensure that you are not using a version below 1.17-pre1</li>
-					<li>Report this as a bug <a href="https://github.com/misode/report/issues/new">on GitHub</a> and upload the report</li>
+					<li>Report this as a bug <a href="https://github.com/misode/report/issues/new" target="_blank">on GitHub</a> and upload the report</li>
 				</ul>
 			</p>
 			<div class="error-close" onClick={() => setErrors(errors.filter(e => e !== error))}>x</div>
