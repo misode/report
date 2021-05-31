@@ -264,8 +264,8 @@ main {
 	border-bottom: 2px solid #555;
 	position: sticky;
 	padding: 8px 10px;
-	top: 45px;
-	z-index: 12;
+	top: 44px;
+	z-index: 10;
 	background-color: var(--dark-2);
 	font-weight: bold;
 }
@@ -287,6 +287,58 @@ main {
 
 .table-action:hover {
 	color: #fff;
+}
+
+.profile-entry {
+	display: flex;
+	padding: 3px 6px;
+	border-radius: 4px;
+	user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-webkit-user-select: none;
+	--indent: 20px;
+}
+
+.profile-entry:hover {
+	background-color: #26262a;
+}
+
+.profile-entry.level-0 { padding-left: calc(20px * 0); }
+.profile-entry.level-1 { padding-left: calc(20px * 1); }
+.profile-entry.level-2 { padding-left: calc(20px * 2); }
+.profile-entry.level-3 { padding-left: calc(20px * 3); }
+.profile-entry.level-4 { padding-left: calc(20px * 4); }
+.profile-entry.level-5 { padding-left: calc(20px * 5); }
+.profile-entry.level-6 { padding-left: calc(20px * 6); }
+.profile-entry.level-7 { padding-left: calc(20px * 7); }
+.profile-entry.level-8 { padding-left: calc(20px * 8); }
+.profile-entry.level-9 { padding-left: calc(20px * 9); }
+.profile-entry.level-10 { padding-left: calc(20px * 10); }
+.profile-entry.level-11 { padding-left: calc(20px * 11); }
+.profile-entry { padding-left: calc(20px * 12); }
+
+.profile-name {
+	flex: 1 1 auto;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.profile-parts, .profile-times, .profile-counts {
+	margin-left: 20px;
+	flex: 0 0 auto;
+	white-space: nowrap;
+	width: 80px;
+	text-align: right;
+}
+
+.profile-counts {
+	width: 70px;
+}
+
+.profile-entry span {
+	display: none;
 }
 
 /* Panel Layout */
@@ -406,6 +458,16 @@ main {
 	}
 	.area-client-metrics {
 		grid-column-end: span 6;
+	}
+
+	.profile-parts {
+		width: 150px;
+	}
+	.profile-counts {
+		width: 130px;
+	}
+	.profile-entry span {
+		display: inline;
 	}
 }
 

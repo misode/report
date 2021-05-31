@@ -76,6 +76,22 @@ export type SystemReport = {
 	vbos: boolean,
 }
 
+export type ProfileDump = {
+	[child: string]: {
+		count: number,
+		averageCount: number,
+		ofTotal?: number,
+		ofParent?: number,
+		children?: ProfileDump,
+	},
+}
+
+export type ProfilingReport = {
+	timeSpan: number,
+	tickSpan: number,
+	dump: ProfileDump,
+}
+
 export type Report = {
 	name: string,
 	client: {
@@ -88,6 +104,7 @@ export type Report = {
 		options: {
 			[option: string]: string,
 		},
+		profiling: ProfilingReport,
 	},
 	server: {
 		levels: {
@@ -102,6 +119,7 @@ export type Report = {
 		gamerules: {
 			[rule: string]: string,
 		},
+		profiling: ProfilingReport,
 		stats: {
 			averageTickTime: number,
 			tickTimes: number[],
@@ -118,7 +136,9 @@ export namespace Report {
 
 		const clientTicks = await loadCsv(zip, 'client/metrics/ticking.csv')
 		const options = await loadList(zip, 'client/options.txt')
+		const clientProfiling = await loadProfilingDump(zip, 'client/profiling.txt')
 		const serverTicks = await loadCsv(zip, 'server/metrics/ticking.csv')
+		const serverProfiling = await loadProfilingDump(zip, 'server/profiling.txt')
 		const gamerules = await loadList(zip, 'server/gamerules.txt', '=') 
 		const stats = await loadList(zip, 'server/stats.txt')
 		const system = await loadList(zip, 'system.txt')
@@ -136,6 +156,7 @@ export namespace Report {
 					})),
 				},
 				options: options,
+				profiling: clientProfiling,
 			},
 			server: {
 				levels: Object.fromEntries(levelIds.map((id, i) => [
@@ -149,6 +170,7 @@ export namespace Report {
 					})),
 				},
 				gamerules: gamerules,
+				profiling: serverProfiling,
 				stats: {
 					pendingTasks: parseInt(stats['pending_tasks']),
 					averageTickTime: parseFloat(stats['average_tick_time']),
@@ -174,6 +196,45 @@ export namespace Report {
 				graphicsMode: system['Graphics mode'],
 				vbos: system['Using VBOs'] === 'Yes',
 			},
+		}
+	}
+
+	async function loadProfilingDump(zip: JSZip, path: string) {
+		const lines = await loadText(zip, path)
+		const start = lines.indexOf('--- BEGIN PROFILE DUMP ---') + 2
+		const end = lines.indexOf('--- END PROFILE DUMP ---')
+		const stack: ProfileDump[] = []
+		const names: string[] = []
+		let level = -1
+		for (let i = start; i < end; i += 1) {
+			const match = lines[i].match(/^\[(\d\d)\][ |]+(.*)(\((\d+)\/(\d+)\) - ([\d\.]+)%\/([\d\.]+)%| (\d+)\/(\d+))$/)!
+			const newLevel = parseInt(match[1])
+			const newName = match[2]
+			if (newLevel > level) {
+				stack.push({})
+			} else {
+				names.pop()
+			}
+			for (let j = 0; j < level - newLevel; j += 1) {
+				const dump = stack.pop()
+				stack[stack.length - 1][names.pop()!].children = dump
+			}
+			names.push(newName)
+			level = newLevel
+			stack[stack.length - 1][newName] = {
+				count: parseInt(match[4] ?? match[8]),
+				averageCount: parseInt(match[5] ?? match[9]),
+				...match[6] && {
+					ofParent: parseFloat(match[6]),
+					ofTotal: parseFloat(match[7]),
+				},
+			}
+		}
+
+		return {
+			timeSpan: parseInt(lines[4].split(':')[1]),
+			tickSpan: parseInt(lines[5].split(':')[1]),
+			dump: stack[0],
 		}
 	}
 
