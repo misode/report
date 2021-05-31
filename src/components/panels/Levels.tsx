@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks'
 import type { Report } from '../../Report'
-import { TableCard } from '../cards'
+import { PropertiesCard, TableCard } from '../cards'
 
 export function LevelsPanel({ report }: { report: Report }) {
 	const [table, setTable] = useState('entities')
@@ -30,6 +30,9 @@ export function LevelsPanel({ report }: { report: Report }) {
 			c.status === 'minecraft:full'
 				? c.fullStatus?.toLowerCase() ?? 'unknown'
 				: c.status?.replace(/^minecraft:/, '') ?? 'unknown',
+			`${report.server.levels[c.dimension].entityChunks
+				.filter(ec => ec.x === c.x && ec.z === c.z)
+				.reduce((a, b) => a + b.entityCount, 0)}`,
 		])
 
 	return <>
@@ -43,12 +46,24 @@ export function LevelsPanel({ report }: { report: Report }) {
 			<li class={`panel${table === 'chunks' ? ' active' : ''}`} onClick={() => setTable('chunks')}>
 				Chunks
 			</li>
+			<li class={`panel${table === 'stats' ? ' active' : ''}`} onClick={() => setTable('stats')}>
+				Stats
+			</li>
 		</ul>
 		{table === 'entities' &&
 			<TableCard name="entities" columns={['Type', 'Position', 'Dimension']} data={entities()}/>}
 		{table === 'block-entities' &&
 			<TableCard name="block-entities" columns={['Type', 'Position', 'Dimension']} data={blockEntities()}/>}
 		{table === 'chunks' &&
-			<TableCard name="chunks" columns={['Position', 'Dimension', 'Level', 'Status']} data={chunks()}/>}
+			<TableCard name="chunks" columns={['Position', 'Dimension', 'Level', 'Status', 'Entities']} data={chunks()}/>}
+		{table === 'stats' && Object.entries(report.server.levels).map(([id, { stats }]) => (
+			<PropertiesCard name="level-stats" title={id} properties={[
+				['Entities', `${stats.entities.knownUuids}`],
+				['Block entities', `${stats.blockEntityTickers}`],
+				['Block ticks', `${stats.blockTicks}`],
+				['Fluid ticks', `${stats.fluidTicks}`],
+				['Spawning chunks', `${stats.spawningChunks}`],
+			]} />
+		))}
 	</>
 }

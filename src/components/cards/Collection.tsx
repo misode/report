@@ -5,7 +5,10 @@ type CardProps = {
 }
 export function CollectionCard({ title, items, name }: CardProps) {
 	return <div class={`card area-${name}`}>
-		{title && <div class="card-title">{title}</div>}
+		{title && <div class="card-title">
+			{title}
+			<span>({items.length})</span>
+		</div>}
 		<div class="collection-list">
 			{items.map(i => <span class="card-value">
 				{i}

@@ -118,8 +118,8 @@ main {
 	min-width: 0;
 	align-items: center;
 	font-size: 18px;
-	padding: 6px 12px;
-	margin: 6px 0;
+	padding: 0 12px 6px;
+	margin: 8px 0;
 	color: #aaa;
 	border-bottom: 2px solid transparent;
 	cursor: pointer;
@@ -162,6 +162,11 @@ main {
 	border-radius: 8px;
 	overflow: hidden;
 	box-shadow: 1px 1px 4px -2px black;
+}
+
+.card-title span {
+	color: #bbb;
+	margin-left: 10px;
 }
 
 .card-title + .card-properties {
@@ -385,7 +390,7 @@ main {
 	grid-template-columns: 2fr 1fr 1fr;
 }
 .area-chunks .table-row {
-	grid-template-columns: 1fr 1fr 1fr 1fr;
+	grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
 }
 
 @media screen and (max-width: 480px) {
@@ -487,6 +492,9 @@ main {
 	.area-gamerules {
 		columns: 2;
 	}
+	.area-level-stats {
+		grid-column-end: span 6;
+	}
 
 	.profile-counts {
 		display: block;
@@ -528,5 +536,8 @@ main {
 	}
 	.area-gamerules {
 		columns: 3;
+	}
+	.area-level-stats {
+		grid-column-end: span 4;
 	}
 }
