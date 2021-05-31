@@ -1,7 +1,7 @@
 import type { Report } from '../../Report'
 import { GraphCard, PropertiesCard } from '../cards'
 
-export function OverviewPanel(report: Report) {
+export function OverviewPanel({ report }: { report: Report }) {
 	const averageTick = report.server.stats.averageTickTime
 	const minimumTick = Math.min(...report.server.stats.tickTimes) / 1000000
 	const maximumTick = Math.max(...report.server.stats.tickTimes) / 1000000

@@ -1,7 +1,7 @@
 import type { Report } from '../../Report'
 import { CollectionCard, PropertiesCard } from '../cards'
 
-export function SystemPanel(report: Report) {
+export function SystemPanel({ report }: { report: Report }) {
 	return <>
 		<PropertiesCard name="version" title="Minecraft version" properties={[
 			['Name', report.system.versionName],

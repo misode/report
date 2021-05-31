@@ -1,21 +1,15 @@
-import type { FunctionalComponent } from 'preact'
 import { useState } from 'preact/hooks'
-import { EmptyPanel, GamerulesPanel, LevelsPanel, OverviewPanel, SystemPanel } from './components/panels'
+import { GamerulesPanel, LevelsPanel, OverviewPanel, ProfilingPanel, SystemPanel } from './components/panels'
 import { Octicon } from './Octicon'
 import { Report } from './Report'
 
-const panels: [string, FunctionalComponent<Report>][] = [
-	['Overview', OverviewPanel],
-	['System', SystemPanel],
-	['Gamerules', GamerulesPanel],
-	['Levels', LevelsPanel],
-	['Profiling', EmptyPanel],
-]
+const panels = ['Overview', 'System', 'Gamerules', 'Levels', 'Profiling']
 
 export function App() {
 	const [reports, setReports] = useState<Report[]>([])
 	const [activeTab, setTab] = useState(0)
-	const [activePanel, setPanel] = useState(0)
+	const [activePanel, setPanel] = useState('Overview')
+	const activeReport = reports[Math.min(reports.length-1, activeTab)]
 
 	const removeReport = (index: number) => {
 		setReports(reports.filter((_, i) => i !== index))
@@ -25,19 +19,25 @@ export function App() {
 		e.preventDefault()
 		if(!e.dataTransfer) return
 
+		const promises = []
+		let existingName = ''
 		for (let i = 0; i < e.dataTransfer.files.length; i++) {
 			const file = e.dataTransfer.files[i]
 			if (file.type.match(/^application\/(x-)?zip(-compressed)?$/)) {
-				const newReport = await Report.fromZip(file)
-				const exists = reports.findIndex(r => r.name === newReport.name)
-				if (exists >= 0) {
-					setTab(exists)
+				if (!reports.find(r => r.name === file.name)) {
+					promises.push(Report.fromZip(file))
 				} else {
-					console.log(newReport.name, newReport)
-					setTab(reports.length)
-					setReports([...reports, newReport])
+					existingName = file.name
 				}
 			}
+		}
+		if (promises.length > 0) {
+			const newReports = await Promise.all(promises)
+			setTab(reports.length + newReports.length - 1)
+			setReports([...reports, ...newReports])
+		} else {
+			const index = reports.findIndex(r => r.name === existingName)
+			if (index !== -1) setTab(index)
 		}
 	}
 
@@ -52,21 +52,26 @@ export function App() {
 		</> : <>
 			<ul class="tabs">
 				{reports.map((report, i) => (
-					<li class={`tab${activeTab === i ? ' active' : ''}`} onClick={() => setTab(i)} title={report.name}>
-						<div class="tab-name">{report.name}</div>
+					<li class={`tab${Math.min(reports.length - 1, activeTab) === i ? ' active' : ''}`}
+						onClick={() => setTab(i)} title={report.name}>
+						<div class="tab-name">{report.name.replace(/\.zip$/, '')}</div>
 						<button class="tab-remove" onClick={() => removeReport(i)}>{Octicon.x}</button>
 					</li>
 				))}
 			</ul>
 			<ul class="panels">
-				{panels.map((panel, i) => (
-					<li class={`panel${activePanel === i ? ' active' : ''}`} onClick={() => setPanel(i)}>
-						{panel[0]}
+				{panels.map((panel) => (
+					<li class={`panel${activePanel === panel ? ' active' : ''}`} onClick={() => setPanel(panel)}>
+						{panel}
 					</li>
 				))}
 			</ul>
 			<div class="report">
-				{panels[activePanel][1](reports[activeTab])}
+				{activePanel === 'Overview' && <OverviewPanel report={activeReport}/>}
+				{activePanel === 'System' && <SystemPanel report={activeReport}/>}
+				{activePanel === 'Gamerules' && <GamerulesPanel report={activeReport}/>}
+				{activePanel === 'Levels' && <LevelsPanel report={activeReport}/>}
+				{activePanel === 'Profiling' && <ProfilingPanel report={activeReport}/>}
 			</div>
 		</>}
 	</main>

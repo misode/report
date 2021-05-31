@@ -1,8 +1,8 @@
 import { useState } from 'preact/hooks'
 import type { Report } from '../../Report'
-import { TableCard } from '../cards/Table'
+import { TableCard } from '../cards'
 
-export function LevelsPanel(report: Report) {
+export function LevelsPanel({ report }: { report: Report }) {
 	const [table, setTable] = useState('entities')
 
 	const entities = () => Object.entries(report.server.levels)

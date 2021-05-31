@@ -127,7 +127,7 @@ export namespace Report {
 		const levels = await Promise.all(levelIds.map(path => loadLevel(zip, path)))
 
 		return {
-			name: file.name.replace(/\.zip$/, ''),
+			name: file.name,
 			client: {
 				metrics: {
 					ticking: clientTicks.map(row => ({
