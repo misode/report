@@ -172,6 +172,14 @@ main {
 	color: #aaa;
 }
 
+.card-property.altered .card-key {
+	color: #79acdb;
+}
+
+.card-property.altered .card-value {
+	color: #59acfa;
+}
+
 .card.graph {
 	display: flex;
 	height: 150px;
