@@ -14,7 +14,13 @@ body {
 	background-color: var(--dark-1);
 }
 
+a {
+	color: inherit;
+}
+
 main {
+	display: flex;
+	flex-direction: column;
 	min-height: 100vh;
 	color: #ffffff;
 	font-family: Consolas, monospace;
@@ -147,7 +153,7 @@ main {
 	display: grid;
 	grid-template-columns: repeat(12, 1fr);
 	gap: 20px;
-	padding: 10px 30px
+	padding: 0 30px
 }
 
 .card {
@@ -240,7 +246,7 @@ main {
 }
 
 .card.table {
-	padding: 0;
+	padding: 8px 0;
 	overflow: unset;
 }
 
@@ -334,11 +340,28 @@ main {
 }
 
 .profile-counts {
-	width: 70px;
+	display: none;
 }
 
 .profile-entry span {
 	display: none;
+}
+
+.footer {
+	flex-grow: 1;
+	justify-self: flex-end;
+	display: flex;
+	align-items: flex-end;
+	padding: 30px;
+	color: #bbb;
+}
+
+.footer > *:not(:last-child) {
+	margin-right: 30px;
+}
+
+.footer a:hover {
+	color: #fff;
 }
 
 /* Panel Layout */
@@ -360,6 +383,7 @@ main {
 @media screen and (max-width: 480px) {
 	.panel {
 		font-size: 16px;
+		padding: 3px 6px;
 	}
 
 	.report {
@@ -414,6 +438,17 @@ main {
 		grid-row: 1;
 		grid-column: 2;
 	}
+
+	.footer {
+		flex-direction: column;
+		align-items: flex-start;
+		justify-content: flex-end;
+	}
+
+	.footer > *:not(:last-child) {
+		margin-right: 0;
+		margin-bottom: 10px;
+	}
 }
 
 @media screen and (min-width: 481px) {
@@ -443,6 +478,11 @@ main {
 	}
 	.area-gamerules {
 		columns: 2;
+	}
+
+	.profile-counts {
+		display: block;
+		width: 70px;
 	}
 }
 

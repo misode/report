@@ -73,6 +73,10 @@ export function App() {
 				{activePanel === 'Levels' && <LevelsPanel report={activeReport}/>}
 				{activePanel === 'Profiling' && <ProfilingPanel report={activeReport}/>}
 			</div>
+			<div class="footer">
+				<p>Developed by Misode</p>
+				<p>Source code on <a href="https://github.com/misode/report" target="_blank">GitHub</a></p>
+			</div>
 		</>}
 	</main>
 }
