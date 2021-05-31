@@ -45,6 +45,48 @@ main {
 	margin: 0.2em 0;
 }
 
+.error {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	margin: 10px 10px;
+	padding: 10px 15px;
+	background-color: #792415;
+	border-radius: 8px;
+	box-shadow: 1px 1px 4px -2px black;
+}
+
+.error p:first-child {
+	margin-right: 30px;
+}
+
+.error p {
+	margin: 5px 0;
+	color: #ddd;
+}
+
+.error ul {
+	margin-left: 20px 
+}
+
+.error-message {
+	color: #fff;
+	font-weight: bold;
+	font-size: 18px;
+}
+
+.error-close {
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 10px 15px;
+	cursor: pointer;
+	user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-webkit-user-select: none;
+}
+
 .tabs {
 	display: flex;
 	list-style: none;
