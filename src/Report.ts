@@ -168,7 +168,7 @@ export namespace Report {
 	}
 
 	async function loadClient(zip: JSZip) {
-		if (!zip.files['client/']) return {}
+		if (!zip.files['client/options.txt']) return undefined
 
 		const ticking = await loadCsv(zip, 'client/metrics/ticking.csv')
 		const options = await loadList(zip, 'client/options.txt')
@@ -195,13 +195,15 @@ export namespace Report {
 		const gamerules = await loadList(zip, 'server/gamerules.txt', '=') 
 		const stats = await loadList(zip, 'server/stats.txt')
 
-		const levelIds = Object.keys(zip.files).filter(f => f.match(/^server\/levels\/[a-z0-9_-]+\/[a-z0-9_-]+\/$/))
+		const levelIds = Object.keys(zip.files)
+			.map(f => f.match(/^server\/levels\/([a-z0-9_-]+(?:\/[a-z0-9_-]+)+)\/stats.txt$/)?.[1] ?? undefined)
+			.filter<string>((id): id is string => id !== undefined)
 		const levels = await Promise.all(levelIds.map(path => loadLevel(zip, path)))
 
 		return {
 			server: {
 				levels: Object.fromEntries(levelIds.map((id, i) => [
-					id.replace(/^server\/levels\/([a-z0-9_-]+)\/([a-z0-9_-]+)\/$/, '$1:$2'),
+					id.replace('/', ':'),
 					levels[i],
 				])),
 				metrics: {
@@ -264,12 +266,12 @@ export namespace Report {
 		}
 	}
 
-	async function loadLevel(zip: JSZip, path: string): Promise<LevelReport> {
-		const blockEntities = await loadCsv(zip, `${path}block_entities.csv`)
-		const chunks = await loadCsv(zip, `${path}chunks.csv`)
-		const entities = await loadCsv(zip, `${path}entities.csv`)
-		const entityChunks = await loadCsv(zip, `${path}entity_chunks.csv`)
-		const stats = await loadList(zip, `${path}stats.txt`)
+	async function loadLevel(zip: JSZip, id: string): Promise<LevelReport> {
+		const blockEntities = await loadCsv(zip, `server/levels/${id}/block_entities.csv`)
+		const chunks = await loadCsv(zip, `server/levels/${id}/chunks.csv`)
+		const entities = await loadCsv(zip, `server/levels/${id}/entities.csv`)
+		const entityChunks = await loadCsv(zip, `server/levels/${id}/entity_chunks.csv`)
+		const stats = await loadList(zip, `server/levels/${id}/stats.txt`)
 		const statsEntities = stats['entities'].split(',').map(e => parseInt(e))
 
 		return {
