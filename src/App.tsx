@@ -20,6 +20,8 @@ export function App() {
 		e.preventDefault()
 		if(!e.dataTransfer) return
 
+		if (errors) setErrors([])
+
 		const promises = []
 		let existingName = ''
 		for (let i = 0; i < e.dataTransfer.files.length; i++) {
