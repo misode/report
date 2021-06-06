@@ -308,13 +308,22 @@ main {
 
 .table-row {
 	display: grid;
-	gap: 10px;
+	align-items: center;
+	gap: 15px;
 	justify-content: space-between;
 	padding: 5px 10px;
+	user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-webkit-user-select: none;
 }
 
 .table-row:nth-child(2n) {
 	background-color: #2c2c31;
+}
+
+.table-body .table-row:hover {
+	background-color: #26262a;
 }
 
 .table-head {
@@ -326,6 +335,10 @@ main {
 	z-index: 10;
 	background-color: var(--dark-2);
 	font-weight: bold;
+}
+
+.table-head .table-column {
+	white-space: nowrap;
 }
 
 .table-foot {
@@ -351,61 +364,57 @@ main {
 	color: #fff;
 }
 
-.card.profile {
-	padding: 8px 0;
-}
-
-.profile-entry {
-	display: flex;
-	padding: 3px 10px;
-	user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	-webkit-user-select: none;
-	--indent: 20px;
-}
-
-.profile-entry:nth-child(2n) {
-	background-color: #2c2c31;
-}
-.profile-entry:hover {
-	background-color: #26262a;
-}
-
-.profile-entry.level-0 { padding-left: 10px; }
-.profile-entry.level-1 { padding-left: 30px; }
-.profile-entry.level-2 { padding-left: 50px; }
-.profile-entry.level-3 { padding-left: 70px; }
-.profile-entry.level-4 { padding-left: 90px; }
-.profile-entry.level-5 { padding-left: 110px; }
-.profile-entry.level-6 { padding-left: 130px; }
-.profile-entry.level-7 { padding-left: 150px; }
-.profile-entry.level-8 { padding-left: 170px; }
-.profile-entry.level-9 { padding-left: 190px; }
-.profile-entry.level-10 { padding-left: 210px; }
-.profile-entry.level-11 { padding-left: 230px; }
-.profile-entry { padding-left: 250px; }
+.table-row.level-0 { padding-left: 10px; }
+.table-row.level-1 { padding-left: 30px; }
+.table-row.level-2 { padding-left: 50px; }
+.table-row.level-3 { padding-left: 70px; }
+.table-row.level-4 { padding-left: 90px; }
+.table-row.level-5 { padding-left: 110px; }
+.table-row.level-6 { padding-left: 130px; }
+.table-row.level-7 { padding-left: 150px; }
+.table-row.level-8 { padding-left: 170px; }
+.table-row.level-9 { padding-left: 190px; }
+.table-row.level-10 { padding-left: 210px; }
+.table-row.level-11 { padding-left: 230px; }
+.table-row.level-12 { padding-left: 250px; }
 
 .profile-name {
-	flex: 1 1 auto;
+	display: flex;
+	align-items: center;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
-.profile-parts, .profile-times, .profile-counts {
-	margin-left: 20px;
-	flex: 0 0 auto;
-	white-space: nowrap;
-	width: 80px;
-	text-align: right;
+.table-button {
+	padding: 4px;
+	cursor: pointer;
+	border-radius: 4px;
 }
 
-.profile-counts {
+.table-prefix {
+	margin-right: 10px;
+}
+
+.table-button > svg {
+	display: block;
+	fill: #fff;
+}
+
+.table-button:hover {
+	background-color: #4f4f55;
+}
+
+.area-profiling .table-row > *:not(.profile-name) {
+	text-align: right;
+	justify-self: flex-end;
+}
+
+.profile-parent-part, .profile-total-count, .profile-average-count {
 	display: none;
 }
 
-.profile-entry span {
+.area-profiling .table-row span {
 	display: none;
 }
 
@@ -437,6 +446,9 @@ main {
 }
 .area-block-entities .table-row {
 	grid-template-columns: 1fr 1fr 1fr;
+}
+.area-profiling .table-row {
+	grid-template-columns: 1fr repeat(2, 80px);
 }
 
 @media screen and (max-width: 480px) {
@@ -550,9 +562,12 @@ main {
 		grid-column-end: span 6;
 	}
 
-	.profile-counts {
+	.area-profiling .table-row {
+		grid-template-columns: 1fr repeat(3, 80px);
+	}
+	.profile-average-count {
 		display: block;
-		width: 70px;
+		grid-column: 4;
 	}
 }
 
@@ -579,6 +594,20 @@ main {
 	.profile-entry span {
 		display: inline;
 	}
+	.area-profiling .table-row {
+		grid-template-columns: 1fr repeat(4, 80px) 90px;
+	}
+	.profile-parent-part {
+		display: block;
+		grid-column: 2;
+	}
+	.profile-total-count {
+		display: block;
+		grid-column: 5;
+	}
+	.profile-average-count {
+		grid-column: 6;
+	}
 }
 
 @media screen and (min-width: 1201px) {
@@ -594,18 +623,4 @@ main {
 	.area-level-stats {
 		grid-column-end: span 4;
 	}
-
-	.profile-entry.level-0 { padding-left: 10px; }
-	.profile-entry.level-1 { padding-left: 40px; }
-	.profile-entry.level-2 { padding-left: 70px; }
-	.profile-entry.level-3 { padding-left: 100px; }
-	.profile-entry.level-4 { padding-left: 130px; }
-	.profile-entry.level-5 { padding-left: 170px; }
-	.profile-entry.level-6 { padding-left: 200px; }
-	.profile-entry.level-7 { padding-left: 230px; }
-	.profile-entry.level-8 { padding-left: 260px; }
-	.profile-entry.level-9 { padding-left: 290px; }
-	.profile-entry.level-10 { padding-left: 320px; }
-	.profile-entry.level-11 { padding-left: 350px; }
-	.profile-entry { padding-left: 380px; }
 }

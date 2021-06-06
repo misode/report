@@ -8,7 +8,7 @@ export function ProfilingPanel({ report }: { report: Report }) {
 	const profile = (report[side] ?? report.server).profiling
 	const tickTime = 1000 * profile.tickSpan / profile.timeSpan
 
-	const toggle = (path: string) => {
+	const toggleRow = (path: string) => {
 		if (hidden.has(path)) {
 			hidden.delete(path)
 		} else {
@@ -31,8 +31,19 @@ export function ProfilingPanel({ report }: { report: Report }) {
 			['Tick span', `${profile.tickSpan} ticks`],
 			['Average tick', `${tickTime.toFixed(3)} mspt`],
 		]} />
-		<div class="card profile area-profile-dump">
-			<ProfilingChildren children={profile.dump} hidden={hidden} path="root" level={0} tickTime={tickTime} onToggle={toggle} />
+		<div class="card table area-profiling">
+			<div class="table-row table-head">
+				<div class="table-column profile-name">Name</div>
+				<div class="table-column table-button profile-parent-part">% Parent</div>
+				<div class="table-column table-button profile-total-part">% Total</div>
+				<div class="table-column table-button profile-time">Avg Time</div>
+				<div class="table-column table-button profile-total-count">Count</div>
+				<div class="table-column table-button profile-average-count">Avg Count</div>
+			</div>
+			<div class="table-body">
+				<ProfilingTree children={profile.dump} hidden={hidden} 
+					path="root" level={0} tickTime={tickTime} onToggle={toggleRow} />
+			</div>
 		</div>
 	</>
 }
@@ -46,27 +57,25 @@ type ProfilingChildrenProps = {
 	onToggle: (path: string) => unknown,
 }
 
-function ProfilingChildren({ children, hidden, path, level, tickTime, onToggle }: ProfilingChildrenProps) {
+function ProfilingTree({ children, hidden, path, level, tickTime, onToggle }: ProfilingChildrenProps) {
 	return <>
 		{Object.entries(children)
 			.map(([name, props]) => {
 				const newPath = `${path}.${name}`
 				return <>
-					<div class={`profile-entry level-${level}`} onClick={props.children && (() => onToggle(newPath))}>
+					<div class={`table-row level-${level}`} onClick={props.children && (() => onToggle(newPath))}>
 						<div class="profile-name">
 							{name.startsWith('ServerLevel[') ? name.split(' ').pop() : name}
 						</div>
-						{props.ofTotal !== undefined && <div class="profile-parts">
-							<span>{props.ofParent} % / </span>{props.ofTotal} %
-						</div>}
-						{props.ofTotal !== undefined && <div class="profile-times">
-							{(tickTime * props.ofTotal / 100).toFixed(3)} ms
-						</div>}
-						<div class="profile-counts">
-							<span>{props.count} / </span>{props.averageCount}
-						</div>
+						{props.ofTotal !== undefined && <>
+							<div class="profile-parent-part">{props.ofParent} %</div>
+							<div class="profile-total-part">{props.ofTotal} %</div>
+							<div class="profile-time">{(tickTime * props.ofTotal / 100).toFixed(3)} ms</div>
+						</>}
+						<div class="profile-total-count">{props.count}</div>
+						<div class="profile-average-count">{props.averageCount}</div>
 					</div>
-					{props.children && !hidden.has(newPath) && <ProfilingChildren children={props.children}
+					{props.children && !hidden.has(newPath) && <ProfilingTree children={props.children}
 						hidden={hidden} path={newPath} level={level + 1} tickTime={tickTime} onToggle={onToggle}/>}
 				</>})}
 	</>
