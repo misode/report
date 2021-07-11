@@ -5,7 +5,6 @@ type CardProps = {
 	defaults?: Record<string, string>,
 }
 export function PropertiesCard({ title, properties, name, defaults = {} }: CardProps) {
-	console.log(properties.filter(p => typeof p[1] === 'string'))
 	return <div class={`card area-${name}`}>
 		{title && <div class="card-title">{title}</div>}
 		<div class="card-properties">

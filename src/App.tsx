@@ -1,9 +1,9 @@
 import { useState } from 'preact/hooks'
-import { GamerulesPanel, LevelsPanel, OverviewPanel, ProfilingPanel, SystemPanel } from './components/panels'
+import { GamerulesPanel, LevelsPanel, OptionsPanel, OverviewPanel, ProfilingPanel, SystemPanel } from './components/panels'
 import { Octicon } from './Octicon'
 import { Report } from './Report'
 
-const panels = ['Overview', 'System', 'Gamerules', 'Levels', 'Profiling']
+const panels = ['Overview', 'System', 'Options', 'Gamerules', 'Levels', 'Profiling']
 
 export function App() {
 	const [reports, setReports] = useState<Report[]>([])
@@ -71,7 +71,7 @@ export function App() {
 				))}
 			</ul>
 			<ul class="panels">
-				{panels.filter(p => !(activeReport.server === undefined && p === 'Gamerules' || p === 'Levels')).map((panel) => (
+				{panels.filter(p => !(activeReport.server === undefined && p === 'Gamerules' || p === 'Levels') && !(activeReport.client === undefined && p === 'Options')).map((panel) => (
 					<li class={`panel${activePanel === panel ? ' active' : ''}`} onClick={() => setPanel(panel)}>
 						{panel}
 					</li>
@@ -81,6 +81,7 @@ export function App() {
 				{activePanel === 'Overview' && <OverviewPanel report={activeReport}/>}
 				{activePanel === 'System' && <SystemPanel report={activeReport}/>}
 				{activePanel === 'Gamerules' && <GamerulesPanel report={activeReport}/>}
+				{activePanel === 'Options' && <OptionsPanel report={activeReport}/>}
 				{activePanel === 'Levels' && <LevelsPanel report={activeReport}/>}
 				{activePanel === 'Profiling' && <ProfilingPanel report={activeReport}/>}
 			</div>

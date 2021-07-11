@@ -548,12 +548,15 @@ main {
 	.area-data-packs {
 		grid-column-end: span 6;
 	}
-	.client-report.server-report  .area-data-packs {
+	.server-report:not(.client-report)  .area-data-packs {
 		grid-row: 1;
 		grid-column: 7/span 6;
 	}
 	.client-report.server-report  .area-resource-packs {
 		grid-column-end: span 6;
+	}
+	.area-options {
+		columns: 2;
 	}
 	.area-gamerules {
 		columns: 2;
@@ -616,6 +619,9 @@ main {
 	}
 	.area-hardware {
 		grid-column-end: span 6;
+	}
+	.area-options {
+		columns: 3;
 	}
 	.area-gamerules {
 		columns: 3;

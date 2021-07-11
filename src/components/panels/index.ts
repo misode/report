@@ -1,5 +1,6 @@
 export * from './Gamerules'
 export * from './Levels'
+export * from './Options'
 export * from './Overview'
 export * from './Profiling'
 export * from './System'
