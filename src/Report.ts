@@ -96,6 +96,10 @@ export type Report = {
 	name: string,
 	client?: {
 		metrics: {
+			jvm?: {
+				tick: number,
+				heap: number,
+			}[],
 			ticking: {
 				tick: number,
 				tickTime: number,
@@ -170,6 +174,7 @@ export namespace Report {
 	async function loadClient(zip: JSZip) {
 		if (!zip.files['client/options.txt']) return undefined
 
+		const jvm = zip.files['client/metrics/jvm.csv']	? await loadCsv(zip, 'client/metrics/jvm.csv') : undefined
 		const ticking = await loadCsv(zip, 'client/metrics/ticking.csv')
 		const options = await loadList(zip, 'client/options.txt')
 		const profiling = await loadProfilingDump(zip, 'client/profiling.txt')
@@ -177,6 +182,10 @@ export namespace Report {
 		return {
 			client: {
 				metrics: {
+					jvm: jvm?.map(row => ({
+						tick: parseInt(row['@tick']),
+						heap: parseInt(row['heap MiB']),
+					})),
 					ticking: ticking.map(row => ({
 						tick: parseInt(row['@tick']),
 						tickTime: Number(row['ticktime']),

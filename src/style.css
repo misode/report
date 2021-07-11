@@ -555,10 +555,10 @@ main {
 	.client-report.server-report  .area-resource-packs {
 		grid-column-end: span 6;
 	}
-	.area-options {
+	.area-options .card-properties {
 		columns: 2;
 	}
-	.area-gamerules {
+	.area-gamerules .card-properties {
 		columns: 2;
 	}
 	.area-level-stats {
@@ -584,7 +584,7 @@ main {
 	.area-server-metrics {
 		grid-column-end: span 6;
 	}
-	.client-report.server-report .area-client-metrics {
+	.server-report .area-client-metrics {
 		grid-column-end: span 6;
 	}
 
@@ -620,10 +620,10 @@ main {
 	.area-hardware {
 		grid-column-end: span 6;
 	}
-	.area-options {
+	.area-options .card-properties {
 		columns: 3;
 	}
-	.area-gamerules {
+	.area-gamerules .card-properties {
 		columns: 3;
 	}
 	.area-level-stats {
