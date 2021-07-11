@@ -8,7 +8,7 @@ export function ProfilingPanel({ report }: { report: Report }) {
 	const [mode, setMode] = useState<'list' | 'tree'>('tree')
 	const [hidden, setHidden] = useState<Set<string>>(new Set())
 	const profile = (report[side] ?? report.server).profiling
-	const tickTime = 1000 * profile.tickSpan / profile.timeSpan
+	const tickTime = profile.timeSpan / profile.tickSpan 
 
 	const toggleRow = (path: string) => {
 		if (hidden.has(path)) {
