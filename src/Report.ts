@@ -61,7 +61,7 @@ export type SystemReport = {
 	versionId: string,
 	isModded: 'Yes' | 'No' | 'Unknown',
 	resourcePacks?: string[],
-	dataPacks: string[],
+	dataPacks?: string[],
 	operatingSystem: string,
 	javaVersion: string,
 	jvmVersion: string,
@@ -70,7 +70,7 @@ export type SystemReport = {
 	cpus: number,
 	frequency: number,
 	graphicsCardName: string,
-	playerCount: [number, number],
+	playerCount?: [number, number],
 	language?: string,
 	graphicsMode?: string,
 	vbos?: boolean,
@@ -106,7 +106,7 @@ export type Report = {
 		},
 		profiling: ProfilingReport,
 	},
-	server: {
+	server?: {
 		levels: {
 			[dimension: string]: LevelReport,
 		},
@@ -150,7 +150,7 @@ export namespace Report {
 				isModded: system['Is Modded'].startsWith('Probably not.') ? 'No'
 					: system['Is Modded'].startsWith('Unknown') ? 'Unknown' : 'Yes',
 				resourcePacks: system['Resource Packs']?.split(',').map(e => e.trim()),
-				dataPacks: system['Data Packs'].split(',').map(e => e.trim()),
+				dataPacks: system['Data Packs']?.split(',').map(e => e.trim()),
 				operatingSystem: system['Operating System'],
 				javaVersion: system['Java Version'],
 				jvmVersion: system['Java VM Version'],
@@ -159,7 +159,7 @@ export namespace Report {
 				cpus: parseInt(system['CPUs']),
 				frequency: parseFloat(system['Frequency (GHz)']),
 				graphicsCardName: system['Graphics card #0 name'],
-				playerCount: system['Player Count'].split(';')[0].split(' / ').map(v => parseInt(v)) as [number, number],
+				playerCount: system['Player Count']?.split(';')[0].split(' / ').map(v => parseInt(v)) as [number, number],
 				language: system['Current Language'],
 				graphicsMode: system['Graphics mode'],
 				vbos: system['Using VBOs'] ? system['Using VBOs'] === 'Yes' : undefined,
@@ -189,6 +189,8 @@ export namespace Report {
 	}
 
 	async function loadServer(zip: JSZip) {
+		if (!zip.files['server/stats.txt']) return undefined
+
 		const jvm = zip.files['server/metrics/jvm.csv']	? await loadCsv(zip, 'server/metrics/jvm.csv') : undefined
 		const ticking = await loadCsv(zip, 'server/metrics/ticking.csv')
 		const profiling = await loadProfilingDump(zip, 'server/profiling.txt')

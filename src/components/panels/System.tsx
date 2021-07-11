@@ -9,7 +9,7 @@ export function SystemPanel({ report }: { report: Report }) {
 			['Is modded', report.system.isModded],
 		]} />
 		{report.client && <PropertiesCard name="game-options" title="Game options" properties={[
-			['Player count', `${report.system.playerCount.join(' / ')}`],
+			['Player count', report.system.playerCount?.join(' / ')],
 			['Language', report.system.language],
 			['Graphics mode', report.system.graphicsMode],
 			['Using VBOs', report.system.vbos ? 'Yes' : 'No'],
@@ -22,11 +22,12 @@ export function SystemPanel({ report }: { report: Report }) {
 		]} />
 		<PropertiesCard name="hardware" title="Hardware" properties={[
 			['Processor', report.system.processorName],
-			['CPUs', `${report.system.cpus}`],
+			['CPUs', report.system.cpus.toFixed()],
 			['Frequency', `${report.system.frequency} GHz`],
 			['Graphics card', report.system.graphicsCardName],
 		]} />
-		<CollectionCard name="data-packs" title="Data packs" items={report.system.dataPacks}/>
+		{report.system.dataPacks &&
+			<CollectionCard name="data-packs" title="Data packs" items={report.system.dataPacks}/>}
 		{report.system.resourcePacks &&
 			<CollectionCard name="resource-packs" title="Resource packs" items={report.system.resourcePacks}/>}
 	</>

@@ -4,10 +4,10 @@ import type { ProfileDump, Report } from '../../Report'
 import { PropertiesCard } from '../cards'
 
 export function ProfilingPanel({ report }: { report: Report }) {
-	const [side, setSide] = useState<'server' | 'client'>('server')
+	const [side, setSide] = useState<'server' | 'client'>(report.server ? 'server' : 'client')
 	const [mode, setMode] = useState<'list' | 'tree'>('tree')
 	const [hidden, setHidden] = useState<Set<string>>(new Set())
-	const profile = (report[side] ?? report.server).profiling
+	const profile = (report[side] ?? report.server)?.profiling ?? { tickSpan: 0, timeSpan: 0, dump: {} }
 	const tickTime = profile.timeSpan / profile.tickSpan 
 
 	const toggleRow = (path: string) => {
@@ -20,7 +20,7 @@ export function ProfilingPanel({ report }: { report: Report }) {
 	}
 
 	return <>
-		{report.client && <ul class="panels">
+		{(report.client && report.server) && <ul class="panels">
 			<li class={`panel${side === 'server' ? ' active' : ''}`} onClick={() => setSide('server')}>
 				Server
 			</li>

@@ -71,13 +71,13 @@ export function App() {
 				))}
 			</ul>
 			<ul class="panels">
-				{panels.map((panel) => (
+				{panels.filter(p => !(activeReport.server === undefined && p === 'Gamerules' || p === 'Levels')).map((panel) => (
 					<li class={`panel${activePanel === panel ? ' active' : ''}`} onClick={() => setPanel(panel)}>
 						{panel}
 					</li>
 				))}
 			</ul>
-			<div class={`report ${activeReport.client ? 'client-report' : 'server-report'}`}>
+			<div class={`report${activeReport.client ? ' client-report' : ''}${activeReport.server ? ' server-report' : ''}`}>
 				{activePanel === 'Overview' && <OverviewPanel report={activeReport}/>}
 				{activePanel === 'System' && <SystemPanel report={activeReport}/>}
 				{activePanel === 'Gamerules' && <GamerulesPanel report={activeReport}/>}
