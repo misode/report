@@ -308,6 +308,7 @@ main {
 
 .table-row {
 	display: grid;
+	position: relative;
 	align-items: center;
 	gap: 15px;
 	justify-content: space-between;
@@ -412,6 +413,26 @@ main {
 
 .profile-parent-part, .profile-total-count, .profile-average-count {
 	display: none;
+}
+
+.profile-menu {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	z-index: 1;
+	background-color: #26262a;
+	border: 2px solid #fff;
+	border-top: 0;
+}
+
+.profile-menu-btn {
+	padding: 4px 8px;
+	cursor: pointer;
+}
+
+.area-profiling .table-row.active {
+	outline: 2px solid #fff;
+	outline-offset: -2px;
 }
 
 .area-profiling .table-row span {

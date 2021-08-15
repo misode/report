@@ -1,4 +1,5 @@
-import { useState } from 'preact/hooks'
+import { useRef, useState } from 'preact/hooks'
+import { useActive } from '../../hooks'
 import { Octicon } from '../../Octicon'
 import type { ProfileDump, Report } from '../../Report'
 import { PropertiesCard } from '../cards'
@@ -103,7 +104,22 @@ type ProfileRowProps = {
 }
 
 function ProfileRow({ name, props, tickTime, level, onClick }: ProfileRowProps) {
-	return <div class={`table-row ${level ? `level-${level}` : ''}`} onClick={onClick}>
+	const [active, setActive] = useActive()
+
+	const onContext = (evt: MouseEvent) => {
+		evt.preventDefault()
+		setActive(true)
+	}
+
+	const input = useRef<HTMLInputElement>(null)
+	const doCopy = (evt: MouseEvent) => {
+		evt.stopPropagation()
+		input.current.select()
+		document.execCommand('copy')
+		setActive(false)
+	}
+
+	return <div class={`table-row ${level ? `level-${level}` : ''} ${active ? 'active' : ''}`} onClick={onClick} onContextMenuCapture={onContext}>
 		<div class="profile-name">
 			{name.startsWith('ServerLevel[') ? name.split(' ').pop() : name}
 		</div>
@@ -114,5 +130,9 @@ function ProfileRow({ name, props, tickTime, level, onClick }: ProfileRowProps) 
 		</>}
 		<div class="profile-total-count">{props.count}</div>
 		<div class="profile-average-count">{props.averageCount}</div>
+		{active && <div class="profile-menu">
+			<input ref={input} type="text" value={name} style="display: block; width: 1px; height: 0; border: none;" />
+			<div class="profile-menu-btn" onClick={doCopy}>Copy</div>
+		</div>}
 	</div>
 }
