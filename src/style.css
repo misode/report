@@ -88,6 +88,9 @@ main {
 }
 
 .tabs {
+	position: fixed;
+	width: 100%;
+	z-index: 10;
 	display: flex;
 	list-style: none;
 	padding: 0 6px;
@@ -147,9 +150,10 @@ main {
 
 .panels {
 	display: flex;
-	position: sticky;
+	position: fixed;
+	width: 100%;
 	z-index: 10;
-	top: -1px;
+	top: 35px;
 	justify-content: center;
 	list-style: none;
 	background-color: #232327;
@@ -179,6 +183,10 @@ main {
 .panel.active {
 	color: #fff;
 	border-color: #ddd;
+}
+
+.report {
+	margin-top: 80px;
 }
 
 .report .panels {
@@ -332,7 +340,7 @@ main {
 	border-bottom: 2px solid #555;
 	position: sticky;
 	padding: 8px 10px;
-	top: 41px;
+	top: 77px;
 	z-index: 10;
 	background-color: var(--dark-2);
 	font-weight: bold;
