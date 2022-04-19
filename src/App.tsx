@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'preact/hooks'
+import { useEffect, useRef, useState } from 'preact/hooks'
 import { CrashPanel, LevelsPanel, OptionsPanel, OverviewPanel, ProfilingPanel, SystemPanel } from './components/panels'
 import { Octicon } from './Octicon'
 import { Report } from './Report'
@@ -60,47 +60,57 @@ export function App() {
 		setReports(reports.filter((_, i) => i !== index))
 	}
 
+	const handleFiles = async (files: File[] | FileList) => {
+		if (errors) setErrors([])
+		if (files instanceof FileList) {
+			const temp: File[] = []
+			for (let i = 0; i < files.length; i++) {
+				temp.push(files[i])
+			}
+			files = temp
+		}
+		const promises = files.flatMap(file => {
+			if (!reports.find(r => r.name === file.name)) {
+				if (file.type.match(/^application\/(x-)?zip(-compressed)?$/)) {
+					return [Report.fromZip(file)]
+				} else if (file.type === 'text/plain' && file.name.match(/^crash-.+-(client|server)\.txt$/)) {
+					return [Report.fromCrash(file)]
+				}
+			}
+			return []
+		})
+		const newReports = await Promise.all(promises.map(async promise => {
+			try {
+				return await promise
+			} catch (error: any) {
+				setErrors([...errors, error.message])
+				console.error(error)
+				return
+			}
+		})
+		)
+		setTab(reports.length + newReports.length - 1)
+		setReports([...reports, ...newReports.filter((r): r is Report => r !== undefined)])
+	}
+
 	const onDrop = async (e: DragEvent) => {
 		e.preventDefault()
 		if(!e.dataTransfer) return
 
-		if (errors) setErrors([])
+		handleFiles(e.dataTransfer.files)
+	}
 
-		const promises = []
-		let existingName = ''
-		for (let i = 0; i < e.dataTransfer.files.length; i++) {
-			const file = e.dataTransfer.files[i]
-			if (file.type.match(/^application\/(x-)?zip(-compressed)?$/)) {
-				if (!reports.find(r => r.name === file.name)) {
-					promises.push(Report.fromZip(file))
-				} else {
-					existingName = file.name
-				}
-			} else if (file.type === 'text/plain' && file.name.match(/^crash-.+-(client|server)\.txt$/)) {
-				promises.push(Report.fromCrash(file))
-			}
-		}
-		if (promises.length > 0) {
-			const newReports = await Promise.all(promises.map(async promise => {
-				try {
-					return await promise
-				} catch (error: any) {
-					setErrors([...errors, error.message])
-					console.error(error)
-					return
-				}
-			}))
-			setTab(reports.length + newReports.length - 1)
-			setReports([...reports, ...newReports.filter((r): r is Report => r !== undefined)])
-		} else {
-			const index = reports.findIndex(r => r.name === existingName)
-			if (index !== -1) setTab(index)
+	const uploadRef = useRef<HTMLInputElement>()
+	const onUpload = () => {
+		if (uploadRef.current.files) {
+			handleFiles(uploadRef.current.files)
 		}
 	}
 
 	return <main onDrop={onDrop} onDragOver={e => e.preventDefault()}>
 		{reports.length === 0 ? <>
 			<div class="drop">
+				<input ref={uploadRef} type="file" onChange={onUpload} accept=".zip,.txt" multiple />
 				<h1>Drop profiling or crash report here</h1>
 				<p>Singleplayer: F3 + L</p>
 				<p>Multiplayer: /perf start</p>
@@ -112,7 +122,7 @@ export function App() {
 				{reports.map((report, i) => (
 					<li class={`tab${Math.min(reports.length - 1, activeTab) === i ? ' active' : ''}`}
 						onClick={() => setTab(i)} title={report.name}>
-						<div class="tab-name">{report.name.replace(/\.zip$/, '')}</div>
+						<div class="tab-name">{report.name.replace(/\.(zip|txt)$/, '')}</div>
 						<button class="tab-remove" onClick={() => removeReport(i)}>{Octicon.x}</button>
 					</li>
 				))}
