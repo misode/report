@@ -1,3 +1,4 @@
+export * from './Crash'
 export * from './Levels'
 export * from './Options'
 export * from './Overview'

@@ -92,6 +92,13 @@ export type ProfilingReport = {
 	dump: ProfileDump,
 }
 
+export type CrashReport = {
+	time: string,
+	description: string,
+	stacktrace: string,
+	remapped?: boolean,
+}
+
 export type Report = {
 	name: string,
 	client?: {
@@ -134,6 +141,7 @@ export type Report = {
 			pendingTasks: number,
 		},
 	},
+	crash?: CrashReport,
 	system: SystemReport,
 }
 
@@ -148,26 +156,35 @@ export namespace Report {
 			name: file.name,
 			...await loadClient(zip),
 			...await loadServer(zip),
-			system: {
-				versionName: system['Minecraft Version'],
-				versionId: system['Minecraft Version ID'],
-				isModded: system['Is Modded'].startsWith('Probably not.') ? 'No'
-					: system['Is Modded'].startsWith('Unknown') ? 'Unknown' : 'Yes',
-				resourcePacks: system['Resource Packs']?.split(',').map(e => e.trim()),
-				dataPacks: system['Data Packs']?.split(',').map(e => e.trim()),
-				operatingSystem: system['Operating System'],
-				javaVersion: system['Java Version'],
-				jvmVersion: system['Java VM Version'],
-				library: system['Backend library'],
-				processorName: system['Processor Name'],
-				cpus: parseInt(system['CPUs']),
-				frequency: parseFloat(system['Frequency (GHz)']),
-				graphicsCardName: system['Graphics card #0 name'],
-				playerCount: system['Player Count']?.split(';')[0].split(' / ').map(v => parseInt(v)) as [number, number],
-				language: system['Current Language'],
-				graphicsMode: system['Graphics mode'],
-				vbos: system['Using VBOs'] ? system['Using VBOs'] === 'Yes' : undefined,
+			system: createSystemReport(system),
+		}
+	}
+
+	export async function fromCrash(file: File): Promise<Report> {
+		const text = await file.text()
+		if (!text.startsWith('---- Minecraft Crash Report ----')) {
+			throw new Error('This is not a crash report')
+		}
+
+		const empty1 = text.indexOf('\n\n')
+		const empty2 = text.indexOf('\n\n', empty1 + 2)
+		const empty3 = text.indexOf('\n\n', empty2 + 2)
+
+		const header = parseList(text.substring(empty1 + 2, empty2).split('\n'))
+
+		const systemText = text.substring(text.indexOf('-- System Details --'))
+		const system = createSystemReport(parseList(systemText.split('\n')))
+
+		const stacktrace = text.substring(empty2 + 2, empty3).replaceAll('\t', '    ')
+
+		return {
+			name: file.name,
+			crash: {
+				time: header['Time'],
+				description: header['Description'],
+				stacktrace: stacktrace,
 			},
+			system,
 		}
 	}
 
@@ -342,6 +359,29 @@ export namespace Report {
 		}
 	}
 
+	function createSystemReport(system: Record<string, string>): SystemReport {
+		return {
+			versionName: system['Minecraft Version'],
+			versionId: system['Minecraft Version ID'],
+			isModded: system['Is Modded'].startsWith('Probably not.') ? 'No'
+				: system['Is Modded'].startsWith('Unknown') ? 'Unknown' : 'Yes',
+			resourcePacks: system['Resource Packs']?.split(',').map(e => e.trim()),
+			dataPacks: system['Data Packs']?.split(',').map(e => e.trim()),
+			operatingSystem: system['Operating System'],
+			javaVersion: system['Java Version'],
+			jvmVersion: system['Java VM Version'],
+			library: system['Backend library'],
+			processorName: system['Processor Name'],
+			cpus: parseInt(system['CPUs']),
+			frequency: parseFloat(system['Frequency (GHz)']),
+			graphicsCardName: system['Graphics card #0 name'],
+			playerCount: system['Player Count']?.split(';')[0].split(' / ').map(v => parseInt(v)) as [number, number],
+			language: system['Current Language'],
+			graphicsMode: system['Graphics mode'],
+			vbos: system['Using VBOs'] ? system['Using VBOs'] === 'Yes' : undefined,
+		}
+	}
+
 	async function loadCsv(zip: JSZip, path: string) {
 		const [first, ...data] = await loadText(zip, path)
 		const header = first.split(',').map(e => e.trim())
@@ -351,11 +391,15 @@ export namespace Report {
 
 	async function loadList(zip: JSZip, path: string, separator = ':') {
 		const lines = await loadText(zip, path)
+		return parseList(lines, separator)
+	}
+
+	function parseList(lines: string[], separator = ':') {
 		return Object.fromEntries(lines
 			.filter(line => line.includes(separator))
 			.map(line => {
 				const [key, ...rest] = line.split(separator)
-				return [key, rest.join(separator).trim()]
+				return [key.trim(), rest.join(separator).trim()]
 			}))
 	}
 

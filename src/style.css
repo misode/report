@@ -220,7 +220,8 @@ main {
 	margin-left: 10px;
 }
 
-.card-title + .card-properties {
+.card-title + .card-properties,
+.card-title + .card-text {
 	margin-top: 10px;
 }
 
@@ -478,6 +479,10 @@ main {
 }
 .area-profiling .table-row {
 	grid-template-columns: 1fr repeat(2, 80px);
+}
+
+.area-stacktrace pre {
+	overflow-x: auto;
 }
 
 @media screen and (max-width: 480px) {
