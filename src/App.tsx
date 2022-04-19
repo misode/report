@@ -147,10 +147,6 @@ export function App() {
 					return null
 				})}
 			</div>
-			<div class="footer">
-				<p>Developed by Misode</p>
-				<p>Source code on <a href="https://github.com/misode/report" target="_blank">GitHub</a></p>
-			</div>
 		</>}
 		{errors.map(error => <div class="error">
 			<p>Something went wrong loading the report:</p>
@@ -163,5 +159,9 @@ export function App() {
 			</p>
 			<div class="error-close" onClick={() => setErrors(errors.filter(e => e !== error))}>x</div>
 		</div>)}
+		<div class="footer">
+			<p>Developed by Misode</p>
+			<p>Source code on <a href="https://github.com/misode/report" target="_blank">GitHub</a></p>
+		</div>
 	</main>
 }

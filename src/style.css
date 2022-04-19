@@ -27,7 +27,8 @@ main {
 }
 
 .drop {
-	height: 100vh;
+	padding-top: 50px;
+	flex-grow: 1;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -480,8 +481,11 @@ main {
 	display: none;
 }
 
-.footer {
+.report ~ .footer {
 	flex-grow: 1;
+}
+
+.footer {
 	justify-self: flex-end;
 	display: flex;
 	align-items: flex-end;
