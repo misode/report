@@ -45,7 +45,7 @@ export function App() {
 	const [activeTab, setTab] = useState(0)
 	const [activePanel, setPanel] = useState('Overview')
 	const [errors, setErrors] = useState<string[]>([])
-	const activeReport = reports[Math.min(reports.length-1, activeTab)]
+	const activeReport: Report | undefined = reports[Math.min(reports.length, activeTab)]
 
 	useEffect(() => {
 		if (activeReport) {
@@ -87,8 +87,7 @@ export function App() {
 				console.error(error)
 				return
 			}
-		})
-		)
+		}))
 		setTab(reports.length + newReports.length - 1)
 		setReports([...reports, ...newReports.filter((r): r is Report => r !== undefined)])
 	}
@@ -108,7 +107,19 @@ export function App() {
 	}
 
 	return <main onDrop={onDrop} onDragOver={e => e.preventDefault()}>
-		{reports.length === 0 ? <>
+		{reports.length > 0 && <ul class="tabs">
+			{reports.map((report, i) => (
+				<li class={`tab${Math.min(reports.length, activeTab) === i ? ' active' : ''}`}
+					onClick={() => setTab(i)} title={report.name}>
+					<div class="tab-name">{report.name.replace(/\.(zip|txt)$/, '')}</div>
+					<button class="tab-button" onClick={() => removeReport(i)}>{Octicon.x}</button>
+				</li>
+			))}
+			<li class="tab new-report">
+				<button class="tab-button" onClick={() => setTab(reports.length)}>{Octicon.plus}</button>
+			</li>
+		</ul>}
+		{(reports.length === 0 || !activeReport) ? <>
 			<div class="drop">
 				<input ref={uploadRef} type="file" onChange={onUpload} accept=".zip,.txt" multiple />
 				<h1>Drop profiling or crash report here</h1>
@@ -118,15 +129,6 @@ export function App() {
 				<p>Crash reports in .minecraft/crash-reports/</p>
 			</div>
 		</> : <>
-			<ul class="tabs">
-				{reports.map((report, i) => (
-					<li class={`tab${Math.min(reports.length - 1, activeTab) === i ? ' active' : ''}`}
-						onClick={() => setTab(i)} title={report.name}>
-						<div class="tab-name">{report.name.replace(/\.(zip|txt)$/, '')}</div>
-						<button class="tab-remove" onClick={() => removeReport(i)}>{Octicon.x}</button>
-					</li>
-				))}
-			</ul>
 			<ul class="panels">
 				{PANELS.map(panel => {
 					if (panel.predicate(activeReport)) {

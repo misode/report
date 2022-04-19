@@ -98,6 +98,7 @@ main {
 }
 
 .tab {
+	position: relative;
 	display: flex;
 	min-width: 0;
 	align-items: center;
@@ -111,6 +112,21 @@ main {
 	-webkit-user-select: none;
 }
 
+.tab:not(:first-child):after {
+	content: '';
+	position: absolute;
+	left: -0.5px;
+	top: 7px;
+	bottom: 7px;
+	width: 1px;
+	background-color: #666;
+}
+
+.tab.active::after,
+.tab.active + .tab:after {
+	content: none;
+}
+
 .tab:hover {
 	background-color: #2b2b30;
 }
@@ -120,13 +136,22 @@ main {
 	background-color: #232327;
 }
 
+.tab.new-report {
+	cursor: initial;
+	flex-shrink: 0;
+}
+
+.tab.new-report:hover {
+	background-color: transparent;
+}
+
 .tab-name {
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 }
 
-.tab-remove {
+.tab-button {
 	width: 24px;
 	height: 24px;
 	display: block;
@@ -135,17 +160,24 @@ main {
 	border-radius: 4px;
 	cursor: pointer;
 	fill: #bbb;
+}
+
+.tab-name + .tab-button {
 	margin-left: 6px;
 }
 
-.tab-remove > svg {
+.tab-button > svg {
 	width: 24px;
 	height: 24px;
 }
 
-.tab-remove:hover {
+.tab-button:hover {
 	background-color: #47474d;
-	fill: #fff;
+	fill: #d75252;
+}
+
+.tab.new-report .tab-button:hover {
+	fill: #78d752;
 }
 
 .panels {
