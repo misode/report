@@ -59,7 +59,7 @@ export type LevelReport = {
 export type SystemReport = {
 	versionName: string,
 	versionId: string,
-	isModded: 'Yes' | 'No' | 'Unknown',
+	isModded?: 'Yes' | 'No' | 'Unknown',
 	resourcePacks?: string[],
 	dataPacks?: string[],
 	operatingSystem: string,
@@ -161,7 +161,7 @@ export namespace Report {
 	}
 
 	export async function fromCrash(file: File): Promise<Report> {
-		const text = await file.text()
+		const text = (await file.text()).replaceAll('\r\n', '\n')
 		if (!text.startsWith('---- Minecraft Crash Report ----')) {
 			throw new Error('This is not a crash report')
 		}
@@ -363,8 +363,9 @@ export namespace Report {
 		return {
 			versionName: system['Minecraft Version'],
 			versionId: system['Minecraft Version ID'],
-			isModded: system['Is Modded'].startsWith('Probably not.') ? 'No'
-				: system['Is Modded'].startsWith('Unknown') ? 'Unknown' : 'Yes',
+			isModded: system['Is Modded'] === undefined ? undefined
+				: system['Is Modded'].startsWith('Probably not.')? 'No'
+					: system['Is Modded'].startsWith('Unknown') ? 'Unknown' : 'Yes',
 			resourcePacks: system['Resource Packs']?.split(',').map(e => e.trim()),
 			dataPacks: system['Data Packs']?.split(',').map(e => e.trim()),
 			operatingSystem: system['Operating System'],
