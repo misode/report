@@ -87,12 +87,15 @@ function ProfilingTree({ children, hidden, defaultExpand, path, level, tickTime,
 	return <>
 		{Object.entries(children)
 			.map<[string, string, ProfileDump[string]]>(([n, p]) => [n, `${path}.${n}`, p])
-			.map(([name, newPath, props]) => <>
-				<ProfileRow name={name} props={props} tickTime={tickTime}
-					level={level} onClick={() => onToggle(newPath)} />
-				{(props.children && hidden.has(newPath) !== defaultExpand) && <ProfilingTree children={props.children}
-					hidden={hidden} defaultExpand={defaultExpand} path={newPath} level={level + 1} tickTime={tickTime} onToggle={onToggle}/>}
-			</>)}
+			.map(([name, newPath, props]) => {
+				const expanded = props.children && hidden.has(newPath) !== defaultExpand
+				return <>
+					<ProfileRow name={name} expanded={expanded} props={props} tickTime={tickTime}
+						level={level} onClick={() => onToggle(newPath)} />
+					{expanded && <ProfilingTree children={props.children!}
+						hidden={hidden} defaultExpand={defaultExpand} path={newPath} level={level + 1} tickTime={tickTime} onToggle={onToggle}/>}
+				</>
+			})}
 	</>
 }
 
@@ -113,13 +116,14 @@ function ProfilingList({ children, tickTime }: ProfilingListProps) {
 
 type ProfileRowProps = {
 	name: string,
+	expanded?: boolean,
 	props: ProfileDump[string],
 	tickTime: number,
 	level?: number,
 	onClick?: () => unknown,
 }
 
-function ProfileRow({ name, props, tickTime, level, onClick }: ProfileRowProps) {
+function ProfileRow({ name, expanded, props, tickTime, level, onClick }: ProfileRowProps) {
 	const [active, setActive] = useActive()
 
 	const onContext = (evt: MouseEvent) => {
@@ -137,6 +141,8 @@ function ProfileRow({ name, props, tickTime, level, onClick }: ProfileRowProps) 
 
 	return <div class={`table-row ${level ? `level-${level}` : ''} ${active ? 'active' : ''}`} onClick={onClick} onContextMenuCapture={onContext}>
 		<div class="profile-name">
+			{expanded === true ? Octicon.chevron_down :
+				expanded === false ? Octicon.chevron_right : null}
 			{name.startsWith('ServerLevel[') ? name.split(' ').pop() : name}
 		</div>
 		{props.ofTotal !== undefined && <>

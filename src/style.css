@@ -429,6 +429,10 @@ main {
 	text-overflow: ellipsis;
 }
 
+.profile-name svg {
+	margin-right: 5px;
+}
+
 .table-button {
 	padding: 4px;
 	cursor: pointer;
@@ -439,7 +443,7 @@ main {
 	margin-right: 10px;
 }
 
-.table-button > svg {
+.table svg {
 	display: block;
 	fill: #fff;
 }
