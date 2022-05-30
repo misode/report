@@ -7,6 +7,7 @@ import { PropertiesCard } from '../cards'
 export function ProfilingPanel({ report }: { report: Report }) {
 	const [side, setSide] = useState<'server' | 'client'>(report.server ? 'server' : 'client')
 	const [mode] = useState<'list' | 'tree'>('tree')
+	const [rainbow, setRainbow] = useState(false)
 	const [defaultExpand, setDefaultExpand] = useState(true)
 	const [hidden, setHidden] = useState<Set<string>>(new Set())
 	const [expanded, setExpanded] = useState<Set<string>>(new Set())
@@ -54,6 +55,9 @@ export function ProfilingPanel({ report }: { report: Report }) {
 					<div class="table-button table-prefix" onClick={() => setDefaultExpand(!defaultExpand)}>
 						{defaultExpand ? Octicon.fold : Octicon.unfold}
 					</div>
+					<div class="table-button table-prefix" onClick={() => setRainbow(!rainbow)}>
+						{Octicon.star}
+					</div>
 					Name
 				</div>
 				<div class="table-column table-button profile-parent-part">% Parent</div>
@@ -62,7 +66,7 @@ export function ProfilingPanel({ report }: { report: Report }) {
 				<div class="table-column table-button profile-total-count">Count</div>
 				<div class="table-column table-button profile-average-count">Avg Count</div>
 			</div>
-			<div class="table-body">
+			<div class={`table-body${rainbow ? ' rainbow' : ''}`}>
 				{mode === 'tree'
 					? <ProfilingTree children={profile.dump} hidden={defaultExpand ? hidden : expanded} 
 						defaultExpand={defaultExpand} path="root" level={0}
