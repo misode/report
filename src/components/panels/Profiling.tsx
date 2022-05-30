@@ -6,18 +6,29 @@ import { PropertiesCard } from '../cards'
 
 export function ProfilingPanel({ report }: { report: Report }) {
 	const [side, setSide] = useState<'server' | 'client'>(report.server ? 'server' : 'client')
-	const [mode, setMode] = useState<'list' | 'tree'>('tree')
+	const [mode] = useState<'list' | 'tree'>('tree')
+	const [defaultExpand, setDefaultExpand] = useState(true)
 	const [hidden, setHidden] = useState<Set<string>>(new Set())
+	const [expanded, setExpanded] = useState<Set<string>>(new Set())
 	const profile = (report[side] ?? report.server ?? report.client)!.profiling
 	const tickTime = profile.timeSpan / profile.tickSpan 
 
 	const toggleRow = (path: string) => {
-		if (hidden.has(path)) {
-			hidden.delete(path)
+		if (defaultExpand) {
+			if (hidden.has(path)) {
+				hidden.delete(path)
+			} else {
+				hidden.add(path)
+			}
+			setHidden(new Set(hidden))
 		} else {
-			hidden.add(path)
+			if (expanded.has(path)) {
+				expanded.delete(path)
+			} else {
+				expanded.add(path)
+			}
+			setExpanded(new Set(expanded))
 		}
-		setHidden(new Set(hidden))
 	}
 
 	return <>
@@ -37,8 +48,11 @@ export function ProfilingPanel({ report }: { report: Report }) {
 		<div class="card table area-profiling">
 			<div class="table-row table-head">
 				<div class="table-column profile-name">
-					<div class="table-button table-prefix" onClick={() => setMode(mode === 'list' ? 'tree' : 'list')}>
+					{/* <div class="table-button table-prefix" onClick={() => setMode(mode === 'list' ? 'tree' : 'list')}>
 						{Octicon.rows}
+					</div> */}
+					<div class="table-button table-prefix" onClick={() => setDefaultExpand(!defaultExpand)}>
+						{defaultExpand ? Octicon.fold : Octicon.unfold}
 					</div>
 					Name
 				</div>
@@ -50,8 +64,9 @@ export function ProfilingPanel({ report }: { report: Report }) {
 			</div>
 			<div class="table-body">
 				{mode === 'tree'
-					? <ProfilingTree children={profile.dump} hidden={hidden} 
-						path="root" level={0} tickTime={tickTime} onToggle={toggleRow} />
+					? <ProfilingTree children={profile.dump} hidden={defaultExpand ? hidden : expanded} 
+						defaultExpand={defaultExpand} path="root" level={0}
+						tickTime={tickTime} onToggle={toggleRow} />
 					: <ProfilingList children={profile.dump} tickTime={tickTime} />}
 			</div>
 		</div>
@@ -61,21 +76,22 @@ export function ProfilingPanel({ report }: { report: Report }) {
 type ProfilingChildrenProps = {
 	children: ProfileDump,
 	hidden: Set<string>,
+	defaultExpand: boolean,
 	path: string,
 	tickTime: number,
 	level: number,
 	onToggle: (path: string) => unknown,
 }
 
-function ProfilingTree({ children, hidden, path, level, tickTime, onToggle }: ProfilingChildrenProps) {
+function ProfilingTree({ children, hidden, defaultExpand, path, level, tickTime, onToggle }: ProfilingChildrenProps) {
 	return <>
 		{Object.entries(children)
 			.map<[string, string, ProfileDump[string]]>(([n, p]) => [n, `${path}.${n}`, p])
 			.map(([name, newPath, props]) => <>
 				<ProfileRow name={name} props={props} tickTime={tickTime}
 					level={level} onClick={() => onToggle(newPath)} />
-				{props.children && !hidden.has(newPath) && <ProfilingTree children={props.children}
-					hidden={hidden} path={newPath} level={level + 1} tickTime={tickTime} onToggle={onToggle}/>}
+				{(props.children && hidden.has(newPath) !== defaultExpand) && <ProfilingTree children={props.children}
+					hidden={hidden} defaultExpand={defaultExpand} path={newPath} level={level + 1} tickTime={tickTime} onToggle={onToggle}/>}
 			</>)}
 	</>
 }
