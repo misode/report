@@ -39,6 +39,9 @@ interface FetchOptions<D> {
 const CACHE_NAME = 'misode-report-v1'
 
 async function cachedFetch<D = unknown>(url: string, { decode = (r => r.json()), refresh }: FetchOptions<D> = {}): Promise<D> {
+	// Fix for https://bugs.mojang.com/browse/WEB-5905
+	url = url.replace('piston-meta.mojang.com', 'launchermeta.mojang.com')
+
 	try {
 		const cache = await caches.open(CACHE_NAME)
 		console.debug(`[cachedFetch] Opened cache ${CACHE_NAME} ${url}`)
