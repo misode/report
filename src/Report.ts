@@ -301,8 +301,9 @@ export namespace Report {
 		const entities = await loadCsv(zip, `server/levels/${id}/entities.csv`)
 		const entityChunks = await loadCsv(zip, `server/levels/${id}/entity_chunks.csv`)
 		const stats = await loadList(zip, `server/levels/${id}/stats.txt`)
-		const statsEntities = stats['entities'].split(',').map(e => parseInt(e))
-
+		const statsEntities = stats['entities'].startsWith('count_id:') // paper
+			?	[parseInt(stats['entities'].match(/count_uuid:(\d+)/)?.[1] ?? '0'), 0, 0, 0, 0, 0]
+			: stats['entities'].split(',').map(e => parseInt(e))
 		return {
 			blockEntities: blockEntities.map(b => ({
 				x: parseFloat(b['x']),
