@@ -60,6 +60,7 @@ export type SystemReport = {
 	versionName: string,
 	versionId: string,
 	isModded?: 'Yes' | 'No' | 'Unknown',
+	serverBrand?: string,
 	resourcePacks?: string[],
 	dataPacks?: string[],
 	operatingSystem: string,
@@ -290,7 +291,7 @@ export namespace Report {
 		return {
 			timeSpan: parseInt(lines[4].split(':')[1]),
 			tickSpan: parseInt(lines[5].split(':')[1]),
-			dump: stack[0],
+			dump: stack?.[0] ?? {},
 		}
 	}
 
@@ -366,6 +367,7 @@ export namespace Report {
 			isModded: system['Is Modded'] === undefined ? undefined
 				: system['Is Modded'].startsWith('Probably not.')? 'No'
 					: system['Is Modded'].startsWith('Unknown') ? 'Unknown' : 'Yes',
+			serverBrand: system['Is Modded'].match(/Server brand changed to '([^']+)'/)?.[1],
 			resourcePacks: system['Resource Packs']?.split(',').map(e => e.trim()),
 			dataPacks: system['Data Packs']?.split(',').map(e => e.trim()),
 			operatingSystem: system['Operating System'],

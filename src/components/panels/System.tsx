@@ -7,6 +7,7 @@ export function SystemPanel({ report }: { report: Report }) {
 			['Name', report.system.versionName],
 			['Id', report.system.versionId],
 			['Is modded', report.system.isModded],
+			['Server brand', report.system.serverBrand],
 		]} />
 		{report.client && <PropertiesCard name="game-options" title="Game options" properties={[
 			['Player count', report.system.playerCount?.join(' / ')],
